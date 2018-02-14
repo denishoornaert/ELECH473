@@ -1,0 +1,11 @@
+	movi 6, 0xf0f0
+	movi 5, 0xf0f0
+	add 6, 6, 6    // shift
+	movi 2, 0x1000 // masque
+  	nand 7, 5, 2   // Application du masque (et stockage dans 7)
+  	movi 3, 0xefff // Masque
+	add 5, 5, 5    // shift
+	beq 7, 3, ab // Test si 7 == 3
+	halt
+ab: addi 6, 6, 1
+	halt

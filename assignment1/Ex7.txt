@@ -1,0 +1,24 @@
+	movi 1, 0xffff
+	movi 2, 0x0001
+	movi 5, 0xefff   // Masque
+	nand 3, 1, 5     // enlève bit de poid fort de 1
+	nand 3, 3, 3     // And
+	nand 4, 2, 5     // enlève bit de poid fort de 2
+	nand 4, 4, 4     // And
+	add 6, 3, 4      // Addition avec un bit de poid fort en moins
+	beq 7, 5, report // 
+	movi 6, 0x0000
+	jalr apres, 0
+report: movi 6, 0x0001
+apres: add 3, 1, 2      // Calcul de la vrai addition
+    movi 0, 0x0000
+	nand 7, 1, 2     // On compare 1 et 2
+	beq 7, 5, equal  // Si 1 et 2 ont un 1 sur le Bit de poid fort
+	nand 7, 1, 6     // On compare 1 et 6
+	beq 7, 5, equal  // Si 1 et 3 ont un 1 sur le Bit de poid fort
+	nand 7, 2, 6     // On compare 2 et 6
+	beq 7, 5, equal  // Si 2 et 3 ont un 1 sur le Bit de poid fort
+	addi 4, 0, 0     // On remet le 4 a zero
+	halt
+equal: addi 4, 0, 1
+	halt
