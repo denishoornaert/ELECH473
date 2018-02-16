@@ -1,11 +1,13 @@
-	movi 6, 0xf0f0
-	movi 5, 0xf0f0
-	add 6, 6, 6    // shift
-	movi 2, 0x1000 // masque
-  	nand 7, 5, 2   // Application du masque (et stockage dans 7)
-  	movi 3, 0xefff // Masque
-	add 5, 5, 5    // shift
-	beq 7, 3, ab // Test si 7 == 3
-	halt
-ab: addi 6, 6, 1
-	halt
+    nop
+    nop
+    nop
+    nop
+    add 6, 6, 6    // Left shift register 6
+    movi 2, 0x8000 // Mask
+    movi 3, 0x7fff // Mask
+    nand 7, 5, 2   // Apply mask
+    add 5, 5, 5    // Left shift register 5
+    beq 7, 3, incr // If 7 equals mask
+    halt
+incr: addi 6, 6, 1
+    halt
