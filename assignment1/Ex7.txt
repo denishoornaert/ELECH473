@@ -1,24 +1,51 @@
-	movi 1, 0xffff
-	movi 2, 0x0001
-	movi 5, 0xefff   // Masque
-	nand 3, 1, 5     // enlève bit de poid fort de 1
-	nand 3, 3, 3     // And
-	nand 4, 2, 5     // enlève bit de poid fort de 2
-	nand 4, 4, 4     // And
-	add 6, 3, 4      // Addition avec un bit de poid fort en moins
-	beq 7, 5, report // 
-	movi 6, 0x0000
-	jalr apres, 0
-report: movi 6, 0x0001
-apres: add 3, 1, 2      // Calcul de la vrai addition
-    movi 0, 0x0000
-	nand 7, 1, 2     // On compare 1 et 2
-	beq 7, 5, equal  // Si 1 et 2 ont un 1 sur le Bit de poid fort
-	nand 7, 1, 6     // On compare 1 et 6
-	beq 7, 5, equal  // Si 1 et 3 ont un 1 sur le Bit de poid fort
-	nand 7, 2, 6     // On compare 2 et 6
-	beq 7, 5, equal  // Si 2 et 3 ont un 1 sur le Bit de poid fort
-	addi 4, 0, 0     // On remet le 4 a zero
-	halt
-equal: addi 4, 0, 1
-	halt
+	movi 1, 0x0000
+	movi 2, 0x0000
+	movi 4, 0x7fff   // Mask 0111 1111 1111 1111
+	nand 5, 1, 4     // Apply mask on 1
+	nand 6, 2, 4     // Apply mask on 2
+	add 3, 1, 2      // Sum of 15 bits of 1 and 2
+	movi 4, 0x8000   // Mask 1000 0000 0000 0000
+	nand 5, 1, 4     // MSB of 1
+	nand 6, 2, 4     // MSB of 2
+	nand 7, 3, 4     // MSB of 1+2 (15 bits !)
+
+	// Condition
+	beq 5, 4, one_ro
+	movi 5, 0x0000			// else
+	movi 3, 0x0017			// testOnRTwo addr
+	jalr 3, 3
+one_ro: nop
+	movi 5, 0x0001
+	// if
+
+testOnRTwo: beq 6, 4, one_rt
+	movi 6, 0x0000			// else
+	movi 3, 0x0020			// testOnRSum addr
+	jalr 3, 3
+one_rt: nop
+	movi 6, 0x0001
+	// if
+
+testOnRSum: beq 7, 4, one_rs
+	movi 7, 0x0000			// else
+	movi 3, 0x0029			// end3 addr
+	jalr 3, 3
+one_rs: nop
+	movi 7, 0x0001
+	// if
+end3: nop
+
+	add 5, 5, 6     // Add MSB of 1 with (MSB of) 2
+	add 5, 5, 7     // Add MSB of SUM with previous sum
+
+	movi 4, 0x0002  // Mask 0000 0000 0000 0010
+	nand 5, 5, 4    // Get the second value of the sum of MSB
+	movi 4, 0xfffd  // Mask 1111 1111 1111 1101
+	beq 5, 4, carry
+	movi 4, 0x0000
+	movi 3, 0x0039			// afterCarry addr
+	jalr 3, 3
+
+carry: movi 4, 0x0001
+afterCarry: add 3, 1, 2
+
