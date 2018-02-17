@@ -30,12 +30,23 @@
 	nand 6, 5, 2	// Isolate 1 bit
 	nand 6, 6, 6	// Reverse to and
 	sw 4, 1, 3	// Save word in 3
-	sw 6, 1, 4
+	sw 6, 1, 4	// Save word in 4
 	
 	// MSB of Reg3+Reg4
-	lw 4, 1, 2	// load res add 15 bits
-	nand 7, 4, 2	// get the MSB of A+B
-	nand 7, 7, 7	// reverse
+	lw 4, 1, 2	// Load res add 15 bits
+	nand 7, 4, 2	// Get the MSB of A+B
+	nand 7, 7, 7	// Reverse
+
+	// Now we have : 
+	// 	REG1 : Memory start
+	//	REG2 : Mask 0x8000
+	//	REG3 : LSB of val1
+	//	REG4 : add 15B + 15B
+	//	REG5 : LSB of val2
+	//	REG6 : MSB bit of REG5
+	//	REG7 : MSB of REG3+REG5
+
+	
 
 	halt 
 	
