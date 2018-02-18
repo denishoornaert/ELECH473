@@ -5,7 +5,7 @@
   	movi 3, 0x7fff
 	beq 7, 3, ok
 	addi 7, 0, 0
-	movi 6, <? ok ?> 
+	movi 6, 0x000c 
 	jalr 6, 6
 ok: addi 7, 0, 1
 	halt	
