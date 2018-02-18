@@ -28,7 +28,7 @@
 			nand 6, 5, 2    									// Isolate 15 bits
 			nand 6, 6, 6    									// Reverse to and
 
-			add 7, 4, 6 										// add Reg3 and Reg5 in Reg1
+			add 7, 4, 6 										// add Reg3 and Reg5 in Reg7
 			sw 7, 1, 2  										// save result in memory
 
 			// MSB of Reg3 and Reg5
@@ -53,6 +53,11 @@
 			//	REG5 : LSB of val2
 			//	REG6 : MSB bit of REG5
 			//	REG7 : MSB of REG3+REG5
+
+			// REG4: Get the MSB bit of REG3
+			nand 4, 3, 2										// Mask
+			nand 4, 4, 4										// Reverse to and
+
 
 			// Condition
 test_one:	beq 4, 2, one_rone
