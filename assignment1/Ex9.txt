@@ -1,4 +1,5 @@
-        movi 1, 0x0005              // operand
+        movi 1, 0x0005              // operand1
+        movi 2, 0x0002              // operand2
         movi 5, 0x0000              // counter
 
 loop:   beq 1, 5, endloop
