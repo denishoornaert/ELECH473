@@ -58,7 +58,6 @@
 			nand 4, 3, 2										// Mask
 			nand 4, 4, 4										// Reverse to and
 
-
 			// Condition
 test_one:	beq 4, 2, one_rone
 			movi 4, 0x0000										// Else
@@ -67,16 +66,18 @@ test_one:	beq 4, 2, one_rone
 
 one_rone:	movi 4, 0x0001										// If
 
-test_two: 	beq 6, 2, one_two
+test_two: 	nop
+			beq 6, 2, one_two
 			movi 6, 0x0000										// Else
-			movi 1, 0x0037										// test_sum addr
+			movi 1, 0x0036										// test_sum addr
 			jalr 1, 1
 
 one_two:	movi 6, 0x0001										// If
 
-test_sum:	beq 7, 2, one_sum
+test_sum:	nop
+			beq 7, 2, one_sum
 			movi 7, 0x0000										// Else
-			movi 1, 0x0041										// sec_part addr
+			movi 1, 0x003f										// sec_part addr
 			jalr 1,1
 
 one_sum:	movi 7, 0x0001										// If
@@ -89,7 +90,7 @@ sec_part:	add 4, 4, 6
 			movi 2, 0xfffd
 			beq 2, 4, car_addr
 			movi 2, 0x0000
-			movi 1, 0x0052										// aft_carr addr
+			movi 1, 0x004e										// aft_carr addr
 			jalr 1, 1
 
 car_addr:	movi 2, 0x0001
