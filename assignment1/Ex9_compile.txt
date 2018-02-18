@@ -1,0 +1,21 @@
+// R1 = smth   # operand 1 LSB
+// R2 = smth   # operand 1 MSB
+// R3 = smth   # operand 2 LSB
+// R4 = 0      # operand 2 MSB
+// R5 = 0      # counter
+// while(R5 != R3):
+//     (R4, R3) = Ex8((R4, R3), (R2, R1))
+//     (R4, R3) = (R4, R3)+(R2, R1)
+//     R5++
+
+            movi 1, 0x0005              // operand1
+            movi 2, 0x0002              // operand2
+            movi 5, 0x0000              // counter
+
+loop:       nop
+            beq 1, 5, endloop
+            nop
+            addi 5, 5, 0x0001           // R5++
+            movi 6, 0x0004              // loop flag addr
+            jalr 6, 6
+endloop:    halt
