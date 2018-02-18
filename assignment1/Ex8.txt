@@ -1,8 +1,8 @@
 	// nop x 8
-	movi 3, 0x0003
-	movi 4, 0x0004
-	movi 5, 0x0005
-	movi 6, 0x0006
+	movi 3, 0xffff
+	movi 4, 0x0000
+	movi 5, 0xffff
+	movi 6, 0x0000
 
 	// start memory address
 	movi 1, 0x0001
@@ -81,7 +81,7 @@ sec_part: nop
 	movi 2, 0x0002
 	nand 4, 4, 2
 	movi 2, 0xfffd
-	beq 5, 4, car_addr
+	beq 2, 4, car_addr
 	movi 2, 0x0000
 	movi 1, 0x0052 // aft_carr addr
 	jalr 1, 1
