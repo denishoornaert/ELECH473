@@ -1,0 +1,11 @@
+        nop
+        nop
+        movi 2, 0x8000
+        nand 7, 1, 2
+        movi 3, 0x7fff
+        beq 7, 3, ok
+        addi 7, 0, 0
+        movi 6, 0x000d 
+        jalr 6, 6
+ok:     addi 7, 0, 1
+end:    halt    
