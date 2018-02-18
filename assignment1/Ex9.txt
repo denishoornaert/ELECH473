@@ -1,0 +1,9 @@
+        movi 1, 0x0005              // operand
+        movi 5, 0x0000              // counter
+
+loop:   beq 1, 5, endloop
+        nop
+        addi 5, 5, 0x0001           // R5++
+        movi 6, 0x0004              // loop flag addr
+        jalr 6, 6
+endloop: halt
