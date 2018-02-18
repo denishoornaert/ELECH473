@@ -46,7 +46,58 @@
 	//	REG6 : MSB bit of REG5
 	//	REG7 : MSB of REG3+REG5
 
-	
+	// Condition
+test_one: nop
+	beq 4, 2, one_rone	// If
+	movi 4, 0x0000		// Else
+	movi 1, ADDR "test_two" // test_two addr
+	jalr 1, 1		// Jump
+
+one_rone: nop 
+	movi 4, 0x0001
+
+test_two: nop
+	beq 6, 2, one_rtwo	// If
+	movi 6, 0x0000		// Else
+	movi 1, ADDR "test_sum" // test_sum addr
+	jalr 1, 1		// Jump
+
+one_two: nop
+	movi 6, 0x0001
+
+test_sum: nop
+	beq 7, 2, one_rsum	// If
+	movi 7, 0x0000		// Else
+	movi 1, ADDR "sec_part" // sec_part addr
+	jalr 1,1		// jump
+
+one_sum: nop
+	movi 7, 0x0001
+
+sec_part: nop
+	add 4, 4, 6
+	add 4, 4, 7
+
+	movi 2, 0x0002
+	nand 4, 4, 2
+	movi 2, 0xfffd
+	beq 5, 4, car_addr
+	movi 2, 0x0000
+	movi 1, ADDR "aft_carr" // aft_carr addr
+	jalr 1, 1
+
+car_addr; nop
+	movi 2, 0x0001
+
+aft_carr: nop
+	add 3, 3, 5
+
+msb_part:
+	movi 1, 0x0001
+	lw 4, 1, 0
+	lw 5, 1, 1
+	add 4, 4, 5
+	add 4, 4, 2
 
 	halt 
 	
