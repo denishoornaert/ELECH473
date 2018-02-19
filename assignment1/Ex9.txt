@@ -1,31 +1,59 @@
-// R1 = smth   # operand 1 LSB
-// R2 = smth   # operand 2 MSB
-// R3 = smth   # operand 1 LSB
-// R4 = 0      # operand 2 MSB
-// R5 = 0      # counter
-// while(R5 != R3):
-//     (R4, R3) = Ex8((R4, R3), (R2, R1))
-//     (R4, R3) = (R4, R3)+(R2, R1)
+// R1 = LSB   # operand 1 
+// R2 = LSB   # operand 2
+// R3 = LSB   # res LSB
+// R4 = MSB   # res MSB
+// R5 = CNT   # counter
+// R6 = 0x0000
+// while(R5 != R2):
+//     (R4, R3) = Ex8((R6, R1), (R4, R3))
 //     R5++
-
-            movi 1, smth                // operand 1 LSB
-            movi 2, smth                // operand 2 LSB
-            movi 3, 0                   // operand 1 MSB
-            movi 4, 0                   // operand 2 MSB
+			
+			// Init values
+            // movi 1, 0x0f0f              // operand 1 LSB
+            // movi 2, 0x0f0f              // operand 2 LSB
+            nop
+            nop
+            nop
+            nop
+            movi 3, 0x0000              // result LSB 
+            movi 4, 0x0000              // result MSB
             movi 5, 0x0000              // counter
-            movi 6, 0x0000              // temporary value
+            movi 6, 0x0000              // MSB dummy + Memory start
 
-loop:       nop
-            beq 1, 5, endloop
+            // Save context
+            sw 1, 6, 0x0001
+            sw 2, 6, 0x0002
+            sw 3, 6, 0x0003
+            sw 4, 6, 0x0004
+            sw 5, 6, 0x0005
+            sw 6, 6, 0x0006
 
-// Begining EX8 ----------------------------------------------------------------
 
-            // start memory address
-            movi 1, 0x0001     // TODO vérifier que c'est utile
+loop:		movi 1, 0x0000     // Memory start
+			lw 5, 1, 0x0005
+			lw 2, 1, 0x0002
+
+			beq 2, 5, end  // Check loop
+			movi 1, <? addOp ?>
+			jalr 1, 1
+
+end:		movi 1, <? endloop ?>
+			jalr 1, 1
+
+
+// Begining EX8 ---------------------------------------------------------------- 
+
+addOp:		movi 1, 0x0000
+			lw 3, 1, 0x0001
+			lw 4, 1, 0x0006
+			lw 5, 1, 0x0003
+			lw 6, 1, 0x0004
+
+			movi 1, 0x0007		// Memory start
 
             // Save Reg4 and Reg6 in memory
-            sw 4, 1, 0
-            sw 6, 1, 1
+            sw 4, 1, 0x0000
+            sw 6, 1, 0x0001
             movi 4, 0x0000
             movi 6, 0x0000
 
@@ -37,7 +65,7 @@ loop:       nop
             nand 6, 6, 6                                        // Reverse to and
 
             add 7, 4, 6                                         // add Reg3 and Reg5 in Reg7
-            sw 7, 1, 2                                          // save result in memory
+            sw 7, 1, 0x0002                                     // save result in memory
 
             // MSB of Reg3 and Reg5
             movi 2, 0x8000                                      // Mask
@@ -45,11 +73,11 @@ loop:       nop
             nand 4, 4, 4                                        // Reverse to and
             nand 6, 5, 2                                        // Isolate 1 bit
             nand 6, 6, 6                                        // Reverse to and
-            sw 4, 1, 3                                          // Save word in 3
-            sw 6, 1, 4                                          // Save word in 4
+            sw 4, 1, 0x0003                                     // Save word in 3
+            sw 6, 1, 0x0004                                     // Save word in 4
 
             // MSB of Reg3+Reg4
-            lw 4, 1, 2                                          // Load res add 15 bits
+            lw 4, 1, 0x0002                                     // Load res add 15 bits
             nand 7, 4, 2                                        // Get the MSB of A+B
             nand 7, 7, 7                                        // Reverse
 
@@ -105,15 +133,19 @@ car_addr:   movi 2, 0x0001
 
 aft_carr:   add 3, 3, 5
 
-msb_part:   movi 1, 0x0001
-            lw 4, 1, 0
-            lw 5, 1, 1
+msb_part:   movi 1, 0x0007
+            lw 4, 1, 0x0000
+            lw 5, 1, 0x0001
             add 4, 4, 5
             add 4, 4, 2
 
 // Ending   EX8 ----------------------------------------------------------------
 
+			movi 1, 0x0000
+			sw 3, 1, 0x0003
+			sw 4, 1, 0x0004
+
             addi 5, 5, 0x0001           // R5++
-            movi 6, 0x0004              // loop flag addr
+            movi 6, <? loop ?>          // loop flag addr
             jalr 6, 6
 endloop:    halt
