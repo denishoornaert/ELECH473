@@ -30,7 +30,6 @@
 
 
 loop:		movi 1, 0x0000     // Memory start
-			lw 5, 1, 0x0005
 			lw 2, 1, 0x0002
 
 			beq 2, 5, end  // Check loop
@@ -144,8 +143,10 @@ msb_part:   movi 1, 0x0007
 			movi 1, 0x0000
 			sw 3, 1, 0x0003
 			sw 4, 1, 0x0004
+			lw 5, 1, 0x0005
 
             addi 5, 5, 0x0001           // R5++
+            sw 5, 1, 0x0005
             movi 6, <? loop ?>          // loop flag addr
             jalr 6, 6
 endloop:    halt

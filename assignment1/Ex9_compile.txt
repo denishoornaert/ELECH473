@@ -30,14 +30,13 @@
 
 
 loop:		movi 1, 0x0000     // Memory start
-			lw 5, 1, 0x0005
 			lw 2, 1, 0x0002
 
 			beq 2, 5, end  // Check loop
-			movi 1, 0x001d
+			movi 1, 0x001c
 			jalr 1, 1
 
-end:		movi 1, 0x0078
+end:		movi 1, 0x0079
 			jalr 1, 1
 
 
@@ -97,7 +96,7 @@ addOp:		movi 1, 0x0000
             // Condition
 test_one:   beq 4, 2, one_rone
             movi 4, 0x0000                                      // Else
-            movi 1, 0x0048                              // test_two addr
+            movi 1, 0x0047                              // test_two addr
             jalr 1, 1
 
 one_rone:   movi 4, 0x0001                                      // If
@@ -105,7 +104,7 @@ one_rone:   movi 4, 0x0001                                      // If
 test_two:   nop
             beq 6, 2, one_two
             movi 6, 0x0000                                      // Else
-            movi 1, 0x0051                              // test_sum addr
+            movi 1, 0x0050                              // test_sum addr
             jalr 1, 1
 
 one_two:    movi 6, 0x0001                                      // If
@@ -113,7 +112,7 @@ one_two:    movi 6, 0x0001                                      // If
 test_sum:   nop
             beq 7, 2, one_sum
             movi 7, 0x0000                                      // Else
-            movi 1, 0x005a                              // sec_part addr
+            movi 1, 0x0059                              // sec_part addr
             jalr 1,1
 
 one_sum:    movi 7, 0x0001                                      // If
@@ -126,7 +125,7 @@ sec_part:   add 4, 4, 6
             movi 2, 0xfffd
             beq 2, 4, car_addr
             movi 2, 0x0000
-            movi 1, 0x0069                              // aft_carr addr
+            movi 1, 0x0068                              // aft_carr addr
             jalr 1, 1
 
 car_addr:   movi 2, 0x0001
@@ -144,8 +143,10 @@ msb_part:   movi 1, 0x0007
 			movi 1, 0x0000
 			sw 3, 1, 0x0003
 			sw 4, 1, 0x0004
+			lw 5, 1, 0x0005
 
             addi 5, 5, 0x0001           // R5++
+            sw 5, 1, 0x0005
             movi 6, 0x0012          // loop flag addr
             jalr 6, 6
 endloop:    halt
