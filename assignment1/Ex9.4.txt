@@ -1,0 +1,112 @@
+// Based on EX7: decrement version & save memory & optimise code
+
+            // reg1 x reg2 = reg4 reg3
+            nop
+            nop
+            nop
+            nop
+            // movi 1, 0x0002
+            // movi 2, 0x0003
+
+            ////////// Memory //////////
+            // 1. result MSB
+            // 2. counter
+
+            // Init
+            movi 3, 0x0000                   // result LSB 
+            movi 4, 0x0000                   // result MSB
+            movi 6, 0x0000                   // MSB dummy + Memory start
+            add 5, 6, 2                      // counter
+
+            // Save in memory
+            sw 4, 6, 0x0001                  // [1] result MSB
+            sw 5, 6, 0x0002                  // [2] counter
+
+
+loop:       beq 6, 5, jumpendloop
+            movi 7, <? initex ?>             // initex addr
+            jalr 7, 7
+
+jumpendloop: movi 7, <? loopend ?>
+            jalr 7, 7
+
+            // Init for Ex7
+initex:     add 2, 6, 3                      // Move 3 to 2 (6 is equals to zero)
+
+
+// ------------------ EX 7 ------------------
+            // reg1 + reg2 = reg3 and carry: reg4
+
+            movi 4, 0x7fff                   // Mask 0111 1111 1111 1111
+            nand 5, 1, 4                     // Apply mask on 1
+            nand 5, 5, 5                     // inverse nand
+            nand 6, 2, 4                     // Apply mask on 2
+            nand 6, 6, 6                     // inverse nand
+            add 3, 5, 6                      // Sum of 15 bits of 1 and 2
+            movi 4, 0x8000                   // Mask 1000 0000 0000 0000
+            nand 5, 1, 4                     // MSB of 1
+            nand 5, 5, 5
+            nand 6, 2, 4                     // MSB of 2
+            nand 6, 6, 6
+            nand 7, 3, 4                     // MSB of 1+2 (15 bits !)
+            nand 7, 7, 7
+
+            // Condition
+            beq 5, 4, one_ro
+            movi 5, 0x0000                   // else
+            movi 3, <? testOnRTwo ?>         // testOnRTwo addr
+            jalr 3, 3
+one_ro:     nop
+            movi 5, 0x0001
+            // if
+
+testOnRTwo: beq 6, 4, one_rt
+            movi 6, 0x0000                   // else
+            movi 3, <? testOnRSum ?>         // testOnRSum addr
+            jalr 3, 3
+one_rt:     nop
+            movi 6, 0x0001
+            // if
+
+testOnRSum: beq 7, 4, one_rs
+            movi 7, 0x0000                   // else
+            movi 3, <? end3 ?>               // end3 addr
+            jalr 3, 3
+one_rs:     nop
+            movi 7, 0x0001
+            // if
+end3:       nop
+
+            add 5, 5, 6                      // Add MSB of 1 with (MSB of) 2
+            add 5, 5, 7                      // Add MSB of SUM with previous sum
+
+            movi 4, 0x0002                   // Mask 0000 0000 0000 0010
+            nand 5, 5, 4                     // Get the second value of the sum of MSB
+            movi 4, 0xfffd                   // Mask 1111 1111 1111 1101
+            beq 5, 4, carry
+            movi 3, <? afterCarry ?>         // afterCarry addr
+            jalr 3, 3
+
+carry:      movi 6, 0x0000
+            lw 7, 6, 0x0001                  // Load MSB of result
+            addi 7, 7, 1                     // Increment
+            sw 7, 6, 0x0004                  // Save MSB
+afterCarry: add 3, 1, 2
+
+// ------------------ End Ex 7 ------------------
+            
+            // reg3 => result
+
+            movi 6, 0x0000                   // memory address
+
+            // Increment counter
+            lw 5, 6, 0x0002                  // Load counter
+            addi 5, 5, -1                    // Decrement
+            sw 5, 6, 0x0005
+
+            movi 7, <? loop ?>               // loop addr
+            jalr 7, 7
+
+loopend:    lw 4, 6, 0x0001
+
+            halt
