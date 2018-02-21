@@ -90,7 +90,7 @@ end3:       nop
 carry:      movi 6, 0x0000
             lw 7, 6, 0x0001                  // Load MSB of result
             addi 7, 7, 1                     // Increment
-            sw 7, 6, 0x0004                  // Save MSB
+            sw 7, 6, 0x0001                  // Save MSB
 afterCarry: add 3, 1, 2
 
 // ------------------ End Ex 7 ------------------
