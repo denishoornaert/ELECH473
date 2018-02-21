@@ -13,7 +13,7 @@
             // 2. counter
 
             // Init
-            movi 3, 0x0000                   // result LSB 
+            movi 3, 0x0000                   // result LSB
             movi 4, 0x0000                   // result MSB
             movi 6, 0x0000                   // MSB dummy + Memory start
             add 5, 6, 2                      // counter
@@ -94,7 +94,7 @@ carry:      movi 6, 0x0000
 afterCarry: add 3, 1, 2
 
 // ------------------ End Ex 7 ------------------
-            
+
             // reg3 => result
 
             movi 6, 0x0000                   // memory address
@@ -102,7 +102,7 @@ afterCarry: add 3, 1, 2
             // Increment counter
             lw 5, 6, 0x0002                  // Load counter
             addi 5, 5, -1                    // Decrement
-            sw 5, 6, 0x0005
+            sw 5, 6, 0x0002
 
             movi 7, <? loop ?>               // loop addr
             jalr 7, 7
