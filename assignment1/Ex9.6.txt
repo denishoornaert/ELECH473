@@ -23,7 +23,7 @@
                 beq 5, 6, zerodetected           // R0 is expected to equal 0
                 movi 3, <? endcond ?>            // else : resume
                 jalr 3, 3
-zerodetected:   movi 3, 0x0000                 // result LSB
+zerodetected:   movi 3, 0x0000                   // result LSB
                 movi 4, 0x0000                   // result MSB
                 halt                             // if : halt
 endcond:        nop
@@ -36,7 +36,7 @@ endcond:        nop
 
                 // Save context
                 sw 1, 6, 0x0001
-                sw 2, 6, 0x0002
+                // sw 2, 6, 0x0002
                 sw 3, 6, 0x0003
                 sw 4, 6, 0x0004
                 sw 5, 6, 0x0005
@@ -53,10 +53,32 @@ loop:           movi 1, 0x0000     // Memory start
 end:            movi 1, <? endloop ?>
                 jalr 1, 1
 
+addOp:          movi 7, 0xffff
+                movi 5, 0xfffe
+                nand 5, 1, 5
+                beq 5, 7, leq1
+                movi 1, 0x000e
+
+                // Bigger than 1
+                lw 5, 1, 0x0002     // MSB for result x2
+                lw 6, 1, 0x0003     // LSB for restul x2
+                nand 4, 6, 5
+                beq 4, 7, res2computed
+                // If not compute -> Load result x1
+                lw 5, 1, 0x0000     // MSB for result x1
+                lw 6, 1, 0x0001     // LSB for result x1
+                // Increment counter 1
+                // Jump to ex8 % TODO
+
+res2computed:   
+
+
+leq1:           
+
 
 // Begining EX8 ----------------------------------------------------------------
 
-addOp:          movi 1, 0x0000
+                movi 1, 0x0000
                 lw 3, 1, 0x0001
                 lw 4, 1, 0x0006
                 lw 5, 1, 0x0003
