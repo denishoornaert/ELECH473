@@ -1,17 +1,27 @@
 // Objective: reg1 * reg2 = reg4(MSB) reg3(LSB)
-// R1 = LSB   # operand 1 
-// R2 = LSB   # operand 2
-// R3 = LSB   # res LSB
-// R4 = MSB   # res MSB
-// R5 = CNT   # counter
-// R6 = 0x0000
-// while(R5 != R2):
-//     (R4, R3) = Ex8((R6, R1), (R4, R3))
-//     R5++
+
+// Memory INFO:
+//  1. operand 1
+//  2. operand 2
+//  3. result LSB
+//  4. result MSB
+//  5. counter
+//  6. MSB operand 1 (used for sum)
+//  7. Sum of the 15 first LSB (used for sum)
+//  8. 1 MSB of operand 1
+//  9. 1 MSB of result (op 2 of Sum)
+// 10. /
+// 11. /
+// 12. /
+// 13. /
+// 14. x2 of Operand 2 LSB
+// 15. x2 of Operand 2 MSB
+// 16. 
+
             
             // Init values
-            // movi 1, 0x0002                                      // operand 1 LSB
-            // movi 2, 0x0003                                      // operand 2 LSB
+            // movi 1, 0x0002                                      // operand 1 LSB (add on every loop)
+            // movi 2, 0x0003                                      // operand 2 LSB (use for comparison with counter)
             nop
             nop
             nop
