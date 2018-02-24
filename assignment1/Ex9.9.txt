@@ -16,10 +16,10 @@
 // 13. /
 // 14. x2 of Operand 2 LSB
 // 15. x2 of Operand 2 MSB
-// 16. 
+// 16.
 
-            
-            // Init values
+
+            // Init entries
             movi 1, 0x0004                                      // operand 1 LSB (add on every loop)
             movi 2, 0x0004                                      // operand 2 LSB (use for comparison with counter)
             // nop
@@ -27,8 +27,22 @@
             // nop
             // nop
 
+            // Check whether one of the operand is equal to 0
+            // (R1 or R2) == 0
+            nand 5, 1, 2
+            nand 5, 5, 5
+
+            movi 6, 0x0000
+            beq 5, 6, zerodetected           // R0 is expected to equal 0
+            movi 3, <? endcond ?>            // else : resume
+            jalr 3, 3
+zerodetected: movi 3, 0x0000                 // result LSB
+            movi 4, 0x0000                   // result MSB
+            halt                             // if : halt
+endcond:    nop
+
             // Init
-            movi 5, 0x0000                                      // result LSB 
+            movi 5, 0x0000                                      // result LSB
             movi 6, 0x0000                                      // result MSB
             movi 7, 0x0000
             add 7, 7, 2                                         // counter
@@ -49,7 +63,7 @@
             jalr 1, 1
 
 preloop:    lw 7, 1, 0x0005                                     // Load counter
-            
+
             movi 6, 0xffff
             movi 4, 0xfffe
             nand 4, 7, 4
@@ -58,28 +72,29 @@ preloop:    lw 7, 1, 0x0005                                     // Load counter
             // Bigger than 1
             lw 3, 1, 0x000e                                     // LSB of operand 1 x2
             lw 4, 1, 0x000f                                     // MSB of operand 1 x2
-            nand 5, 4, 3
-            nand 5, 5, 5       
-            beq 5, 6, res2computed
+            // (R3 or R4) == 0
+            nand 5, 3, 3
+            nand 6, 4, 4
+            nand 5, 5, 6
+            movi 6, 0x0000
+            beq 5, 6, resnot2computed
 
-            // If not compute -> Load result x1
+            // If computed -> just decrement by 2
+            addi 7, 7, -2                                     // Decrement counter
+            // Jump to ex8
+            movi 1, <? loop ?>
+            jalr 1, 1
+
+            // If not computed -> Load result x1
+resnot2computed: nop
 leq1:       addi 7, 7, -1                                       // Decrement counter
             // Load operand for ex 8
             lw 3, 1, 0x0001                                     // LSB for operand 1 x1
             movi 4, 0x0000                                      // MSB for operand 1 x1
 
-            // Jump to ex8 % TODO
-            movi 1, <? loop ?>
-            jalr 1, 1
-
-
-res2computed: addi 7, 7, -2                                     // Decrement counter
-            halt
-
-
 loop:       movi 1, 0x0000
             sw 7, 1, 0x0005                                     // Save increment
-            
+
             beq 1, 7, end                                       // Check end of loop or not
             movi 7, <? addOp ?>
             jalr 7, 7
@@ -88,13 +103,13 @@ end:        movi 7, <? endloop ?>
             jalr 7, 7
 
 
-// Begining EX8 ---------------------------------------------------------------- 
+// Begining EX8 ----------------------------------------------------------------
             // Input of EX8:
             //     reg4 reg3     + reg6 reg5 = reg4 reg3
             // operand 1 (or x2) +  result   =  result
 
 addOp:      lw 5, 1, 0x0003                                     // Load LSB result in reg 5
-            
+
             sw 4, 1, 0x0006                                     // Save MSB of operand 1
             movi 4, 0x0000
 
