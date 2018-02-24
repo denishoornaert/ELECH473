@@ -72,11 +72,12 @@ preloop:    lw 7, 1, 0x0005                                     // Load counter
             // Bigger than 1
             lw 3, 1, 0x000e                                     // LSB of operand 1 x2
             lw 4, 1, 0x000f                                     // MSB of operand 1 x2
-            // (R3 or R4) == 0
-            nand 5, 4, 3
-            nand 5, 5, 5
+            // (R3 nor R4) == 0
+            nand 5, 3, 3
+            nand 6, 4, 4
+            nand 5, 5, 6
             movi 6, 0x0000
-            beq 5, 6, resnot2computed
+            beq 5, 6, res2notcomputed
 
             // If computed -> just decrement by 2
             addi 7, 7, -2                                     // Decrement counter
@@ -85,7 +86,7 @@ preloop:    lw 7, 1, 0x0005                                     // Load counter
             jalr 1, 1
 
             // If not computed -> Load result x1
-resnot2computed: nop
+res2notcomputed: nop
 leq1:       addi 7, 7, -1                                       // Decrement counter
             // Load operand for ex 8
             lw 3, 1, 0x0001                                     // LSB for operand 1 x1
