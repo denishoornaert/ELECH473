@@ -188,7 +188,7 @@ aft_carr:   add 3, 3, 5
 
             lw 7, 1, 0x0005                                     // Load counter
             lw 6, 1, 0x0002                                     // Load number of loop
-            addi 6, 6, -2                                       // Minus 2
+            addi 6, 6, -1                                       // Minus 2
             beq 6, 7, savex2
             movi 6, <? afterSave ?>
             jalr 6, 6
