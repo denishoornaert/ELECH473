@@ -52,17 +52,17 @@ endcond:    movi 5, 0x0000                                      // result LSB
             sw 5, 3, 0x0003                                     // 3.  result LSB
             sw 6, 3, 0x0004                                     // 4.  result MSB
 
-            sw 3, 3, 0x0007                                     // 10. Init 0 for save x2 (LSB)
-            sw 3, 3, 0x0008                                     // 11. Init 0 for save x2 (MSB)
+            sw 3, 3, 0x0007                                     // 7.  Init 0 for save x2 (LSB)
+            sw 3, 3, 0x0008                                     // 8.  Init 0 for save x2 (MSB)
 
-            sw 3, 3, 0x0009                                     // 12. Init 0 for save x4 (LSB)
-            sw 3, 3, 0x000a                                     // 13. Init 0 for save x4 (MSB)
+            sw 3, 3, 0x0009                                     // 9.  Init 0 for save x4 (LSB)
+            sw 3, 3, 0x000a                                     // 10. Init 0 for save x4 (MSB)
 
-            sw 3, 3, 0x000b                                     // 14. Init 0 for save x8 (LSB)
-            sw 3, 3, 0x000c                                     // 15. Init 0 for save x8 (MSB)
+            sw 3, 3, 0x000b                                     // 11. Init 0 for save x8 (LSB)
+            sw 3, 3, 0x000c                                     // 12. Init 0 for save x8 (MSB)
 
-            sw 3, 3, 0x000d                                     // 14. Init 0 for save x16 (LSB)
-            sw 3, 3, 0x000e                                     // 15. Init 0 for save x16 (MSB)
+            sw 3, 3, 0x000d                                     // 13. Init 0 for save x16 (LSB)
+            sw 3, 3, 0x000e                                     // 14. Init 0 for save x16 (MSB)
 
             // Prepare input for ex8
             movi 4, 0x0000
