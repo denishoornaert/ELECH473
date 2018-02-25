@@ -39,10 +39,8 @@ zerodetected: movi 3, 0x0000                                    // result LSB
             movi 4, 0x0000                                      // result MSB
             halt                                                // if : halt
 
-endcond:    nop
-
             // Init
-            movi 5, 0x0000                                      // result LSB
+endcond:    movi 5, 0x0000                                      // result LSB
             movi 6, 0x0000                                      // result MSB
             movi 7, 0x0000
             add 7, 7, 2                                         // counter
@@ -77,7 +75,7 @@ preloop:    lw 7, 1, 0x0005                                     // Load counter
             // Test for "x2" or "x4"
             movi 6, 0xffff
 
-            movi 4, 0xfff8
+            movi 4, 0xfffc
             nand 4, 7, 4
             beq 4, 6, leq3
 
