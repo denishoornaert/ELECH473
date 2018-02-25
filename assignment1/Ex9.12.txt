@@ -71,12 +71,12 @@ endcond:    movi 5, 0x0000                                      // result LSB
 preloop:    addi 7, 7, -1                                       // Decrement counter
 
             // Test for "x2" or "x4" or "x8"
-            movi 6, 0xffff
+            movi 2, 0xffff
 
             // Test for "x8"
             movi 4, 0xfff8
             nand 4, 7, 4
-            beq 4, 6, leq7
+            beq 4, 2, leq7
 
             // Bigger than 7
             lw 3, 1, 0x000b                                     // LSB of operand 1 x8
@@ -95,7 +95,7 @@ preloop:    addi 7, 7, -1                                       // Decrement cou
             // Test for "x4"
 leq7:       movi 4, 0xfffc
             nand 4, 7, 4
-            beq 4, 6, leq3
+            beq 4, 2, leq3
 
             // Bigger than 3
             lw 3, 1, 0x0009                                     // LSB of operand 1 x4
