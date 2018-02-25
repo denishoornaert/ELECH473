@@ -137,7 +137,7 @@ leq7:       movi 4, 0xfffc
             // Test for "x2"
 leq3:       movi 4, 0xfffe
             nand 4, 7, 4
-            beq 4, 1, leq1
+            beq 4, 2, leq1
 
             // Bigger than 1
             lw 3, 1, 0x0007                                     // LSB of operand 1 x2
