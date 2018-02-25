@@ -60,6 +60,9 @@ endcond:    movi 5, 0x0000                                      // result LSB
             sw 3, 3, 0x000b                                     // 14. Init 0 for save x8 (LSB)
             sw 3, 3, 0x000c                                     // 15. Init 0 for save x8 (MSB)
 
+            sw 3, 3, 0x000d                                     // 14. Init 0 for save x16 (LSB)
+            sw 3, 3, 0x000e                                     // 15. Init 0 for save x16 (MSB)
+
             // Prepare input for ex8
             movi 4, 0x0000
             add 3, 3, 1
@@ -79,15 +82,15 @@ preloop:    addi 7, 7, -1                                       // Decrement cou
             beq 4, 6, leq15
 
             // Bigger than 15
-            lw 3, 1, 0x000d                                     // LSB of operand 1 x8
-            lw 4, 1, 0x000e                                     // MSB of operand 1 x8
+            lw 3, 1, 0x000d                                     // LSB of operand 1 x16
+            lw 4, 1, 0x000e                                     // MSB of operand 1 x16
             // (R3 or R4) == 0
             nand 5, 3, 3
             nand 6, 4, 4
             nand 5, 5, 6
-            beq 5, 1, leq15                                     // If x8 not yet computed
+            beq 5, 1, leq15                                     // If x16 not yet computed
 
-            addi 7, 7, -15                                       // If compute -> just decrement by 4
+            addi 7, 7, -15                                      // If compute -> just decrement by 15
             // Jump to ex8
             movi 2, <? loop ?>
             jalr 2, 2
@@ -106,7 +109,7 @@ leq15:      movi 4, 0xfff8
             nand 5, 5, 6
             beq 5, 1, leq7                                      // If x8 not yet computed
 
-            addi 7, 7, -7                                       // If compute -> just decrement by 4
+            addi 7, 7, -7                                       // If compute -> just decrement by 7
             // Jump to ex8
             movi 2, <? loop ?>
             jalr 2, 2
@@ -263,6 +266,9 @@ aft_carr:   add 3, 3, 5
             addi 6, 6, -4                                       // Minus 7
             beq 6, 7, savex8
 
+            addi 6, 6, -8                                       // Minus 15
+            beq 6, 7, savex16
+
             movi 6, <? afterSave ?>
             jalr 6, 6
 
@@ -281,6 +287,12 @@ savex4:     sw 3, 1, 0x0009                                     // Save x4 resul
             // Bigger than 7
 savex8:     sw 3, 1, 0x000b                                     // Save x8 result (LSB)
             sw 4, 1, 0x000c                                     // Save x8 result (MSB)
+            movi 6, <? afterSave ?>
+            jalr 6, 6
+
+savex16:    sw 3, 1, 0x000d
+            sw 4, 1, 0x000e
+
 
 afterSave:  movi 6, <? preloop ?>                               // preloop flag addr
             jalr 6, 6
