@@ -14,8 +14,8 @@
 // 11. x2 of Operand 2 MSB
 // 12. x4 of Operand 2 LSB
 // 13. x4 of Operand 2 MSB
-// 14. 
-// 15. 
+// 14. x8 of Operand 2 LSB
+// 15. x8 of Operand 2 MSB
 // 16.
 
 
