@@ -72,7 +72,8 @@ preloop:    lw 7, 1, 0x0005                                     // Load counter
             // Bigger than 1
             lw 3, 1, 0x000e                                     // LSB of operand 1 x2
             lw 4, 1, 0x000f                                     // MSB of operand 1 x2
-            // (R3 nor R4) == 0
+            // (R3 or R4) == 0
+            movi 6, 0xffff // TODO usefull ?
             nand 5, 3, 3
             nand 6, 4, 4
             nand 5, 5, 6
@@ -86,7 +87,7 @@ preloop:    lw 7, 1, 0x0005                                     // Load counter
             jalr 1, 1
 
             // If not computed -> Load result x1
-res2notcomputed: nop
+res2notcomputed: nop // TODO common flag for leq and res2notcomputed
 leq1:       addi 7, 7, -1                                       // Decrement counter
             // Load operand for ex 8
             lw 3, 1, 0x0001                                     // LSB for operand 1 x1
@@ -99,6 +100,7 @@ loop:       movi 1, 0x0000
             movi 7, <? addOp ?>
             jalr 7, 7
 
+            // TODO replace the two next lines by the lines 218-220 (endloop)
 end:        movi 7, <? endloop ?>
             jalr 7, 7
 
