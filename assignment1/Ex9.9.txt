@@ -20,25 +20,25 @@
 
 
             // Init entries
-            movi 1, 0x0004                                      // operand 1 LSB (add on every loop)
-            movi 2, 0x0004                                      // operand 2 LSB (use for comparison with counter)
+            movi 1, 0x0007                                      // operand 1 LSB (add on every loop)
+            movi 2, 0x000f                                      // operand 2 LSB (use for comparison with counter)
             // nop
             // nop
             // nop
             // nop
 
-            // Check whether one of the operand is equal to 0
-            // (R1 or R2) == 0
-            nand 5, 1, 2
-            nand 5, 5, 5
-
+            // Test if operand 1 == 0 ?
             movi 6, 0x0000
-            beq 5, 6, zerodetected           // R0 is expected to equal 0
-            movi 3, <? endcond ?>            // else : resume
+            beq 1, 6, zerodetected
+            beq 2, 6, zerodetected
+
+            movi 3, <? endcond ?>                               // else : resume
             jalr 3, 3
-zerodetected: movi 3, 0x0000                 // result LSB
-            movi 4, 0x0000                   // result MSB
-            halt                             // if : halt
+
+zerodetected: movi 3, 0x0000                                    // result LSB
+            movi 4, 0x0000                                      // result MSB
+            halt                                                // if : halt
+
 endcond:    nop
 
             // Init
@@ -55,6 +55,12 @@ endcond:    nop
             sw 6, 3, 0x0004                                     // 4. result MSB
             sw 7, 3, 0x0005                                     // 5. counter % TODO (utile ?)
 
+            sw 3, 3, 0x000e                                     // Init 0 for save x2 (LSB)
+            sw 3, 3, 0x000f                                     // Init 0 for save x2 (MSB)
+
+            // [DEBUG] Use only to save the number of "x2" used
+            // sw 3, 3, 0x0010
+
             // Prepare input for ex8
             movi 4, 0x0000
             lw 3, 3, 0x0001
@@ -63,6 +69,7 @@ endcond:    nop
             jalr 1, 1
 
 preloop:    lw 7, 1, 0x0005                                     // Load counter
+            addi 7, 7, -1                                       // Decrement counter
 
             movi 6, 0xffff
             movi 4, 0xfffe
@@ -81,16 +88,22 @@ preloop:    lw 7, 1, 0x0005                                     // Load counter
             beq 5, 6, res2notcomputed
 
             // If computed -> just decrement by 2
-            addi 7, 7, -2                                     // Decrement counter
+            addi 7, 7, -1                                     // Decrement counter
+
+            // [DEBUG] Record number of use "x2"
+            // lw 5, 1, 0x0010
+            // addi 5, 5, 0x0001
+            // sw 5, 1, 0x0010
+
             // Jump to ex8
             movi 1, <? loop ?>
             jalr 1, 1
 
             // If not computed -> Load result x1
-res2notcomputed: nop // TODO common flag for leq and res2notcomputed
-leq1:       addi 7, 7, -1                                       // Decrement counter
+res2notcomputed: nop
+
             // Load operand for ex 8
-            lw 3, 1, 0x0001                                     // LSB for operand 1 x1
+leq1:       lw 3, 1, 0x0001                                     // LSB for operand 1 x1
             movi 4, 0x0000                                      // MSB for operand 1 x1
 
 loop:       movi 1, 0x0000
@@ -182,12 +195,12 @@ sec_part:   add 4, 4, 6
             movi 2, 0x0002
             nand 4, 4, 2
             movi 2, 0xfffd
-            beq 2, 4, car_addr
+            beq 2, 4, carr_inc
             movi 2, 0x0000
             movi 1, <? aft_carr ?>                              // aft_carr addr
             jalr 1, 1
 
-car_addr:   movi 2, 0x0001
+carr_inc:   movi 2, 0x0001
 
 aft_carr:   add 3, 3, 5
 
@@ -218,4 +231,9 @@ afterSave:  movi 6, <? preloop ?>                               // preloop flag 
             jalr 6, 6
 endloop:    lw 3, 1, 0x0003
             lw 4, 1, 0x0004
+
+            // [DEBUG] Use to print/output the number of "x2" use
+            // lw 3, 1, 0x0010
+            // movi 4, 0x0000
+
             halt
