@@ -88,7 +88,7 @@ preloop:    movi 1, 0x0006                                       // Memory start
             // 7: counter
 
             // Test for "x2" or "x4" or "x8" or "x16" or "x32"
-
+            addi 7, 7, -1
 
 leqx:       movi 2, 0x0011                                       // Memory end
             addi 1, 1, 0x0001                                    // Increment memory
@@ -121,7 +121,6 @@ leqx:       movi 2, 0x0011                                       // Memory end
 endleqx:    movi 1, 0x0000
             lw 3, 1, 0x0001                                     // LSB for operand 1 x1
             movi 4, 0x0000                                      // MSB for operand 1 x1
-            addi 7, 7, -1
 
 loop:       movi 1, 0x0000
             sw 7, 1, 0x0005                                     // Save increment
@@ -228,7 +227,7 @@ aft_carr:   add 3, 3, 5
             movi 1, 0x0011                                      // addr base+1 (17)
 savexloop:  addi 1, 1, -1
             movi 2, 0x0006
-            beq 1, 2, after_save
+            beq 1, 2, after_save                                // End of masque which must be test
             lw 2, 1, 0x0000                                     // Load masque
             addi 2, 2, 1                                        // Complement of 2
             add 2, 6, 2
