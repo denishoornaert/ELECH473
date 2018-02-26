@@ -13,7 +13,7 @@
 
             // Init entries
             movi 1, 0x0007                                      // operand 1 LSB (add on every loop)
-            movi 2, 0x0009                                      // operand 2 LSB (use for comparison with counter)
+            movi 2, 0x0004                                      // operand 2 LSB (use for comparison with counter)
             // nop
             // nop
             // nop
@@ -113,16 +113,17 @@ leqx:       movi 2, 0x0011                                       // Memory end
             // reg2 contain the masque = not(value of x)
             addi 2, 2, 1                                        // Complement of 2
             add 7, 7, 2
-            
+
             movi 2, <? loop ?>
             jalr 2, 2
 
             // Load operand for ex 8
-endleqx:    lw 3, 1, 0x0001                                     // LSB for operand 1 x1
+endleqx:    movi 1, 0x0000
+            lw 3, 1, 0x0001                                     // LSB for operand 1 x1
             movi 4, 0x0000                                      // MSB for operand 1 x1
 
-
-loop:       sw 7, 1, 0x0005                                     // Save increment
+loop:       movi 1, 0x0000
+            sw 7, 1, 0x0005                                     // Save increment
 
             beq 1, 7, end                                       // Check end of loop or not
             movi 7, <? addOp ?>
@@ -225,6 +226,8 @@ aft_carr:   add 3, 3, 5
 
             movi 1, 0x0011                                      // addr base+1 (17)
 savexloop:  addi 1, 1, -1
+            movi 2, 0x0006
+            beq 1, 2, after_save
             lw 2, 1, 0x0000                                     // Load masque
             addi 2, 2, 1                                        // Complement of 2
             add 2, 6, 2
@@ -236,7 +239,7 @@ savexloop:  addi 1, 1, -1
 savex:      sw 3, 1, 0x000a                                     // load the LSB (masks memory zone + 10)
             sw 4, 1, 0x0014                                     // load the MSB (masks memory zone + 20)
 
-afterSave:  movi 6, <? preloop ?>                               // preloop flag addr
+after_save: movi 6, <? preloop ?>                               // preloop flag addr
             jalr 6, 6
 
 halt                                                            // Normaly neverd used ! see label "end"
