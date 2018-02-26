@@ -12,8 +12,8 @@
 
 
             // Init entries
-            movi 1, 0x0007                                      // operand 1 LSB (add on every loop)
-            movi 2, 0x0004                                      // operand 2 LSB (use for comparison with counter)
+            movi 1, 0x0004                                      // operand 1 LSB (add on every loop)
+            movi 2, 0x0007                                      // operand 2 LSB (use for comparison with counter)
             // nop
             // nop
             // nop
@@ -76,7 +76,7 @@ comp_end:   movi 3, 0x0000                                      // Memory start
             movi 2, <? loop ?>
             jalr 2, 2
 
-preloop:    addi 7, 7, -1                                       // Decrement counter
+preloop:    movi 1, 0x0006                                       // Memory start
       
             // Here we have:
             // 1: memory start address
@@ -88,15 +88,15 @@ preloop:    addi 7, 7, -1                                       // Decrement cou
             // 7: counter
 
             // Test for "x2" or "x4" or "x8" or "x16" or "x32"
-            movi 1, 0x0006                                       // Memory start
+            
 
 leqx:       movi 2, 0x0011                                       // Memory end
             addi 1, 1, 0x0001                                    // Increment memory
             beq 1, 2, endleqx                                    // Have read all address
             lw 2, 1, 0x0000                                      // Load masque for x
-            nand 2, 7, 2                                         // Apply masque
+            nand 3, 7, 2                                         // Apply masque
             movi 4, 0xffff
-            beq 2, 4, leqx
+            beq 3, 4, leqx
 
             // Bigger than x (reg 4)
             lw 3, 1, 0x000a
@@ -121,6 +121,7 @@ leqx:       movi 2, 0x0011                                       // Memory end
 endleqx:    movi 1, 0x0000
             lw 3, 1, 0x0001                                     // LSB for operand 1 x1
             movi 4, 0x0000                                      // MSB for operand 1 x1
+            addi 7, 7, -1
 
 loop:       movi 1, 0x0000
             sw 7, 1, 0x0005                                     // Save increment
