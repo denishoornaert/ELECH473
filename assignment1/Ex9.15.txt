@@ -12,7 +12,7 @@
 
 
             // Init entries
-            movi 1, 0x0004                                      // operand 1 LSB (add on every loop)
+            movi 1, 0xffff                                      // operand 1 LSB (add on every loop)
             movi 2, 0x0007                                      // operand 2 LSB (use for comparison with counter)
             // nop
             // nop
@@ -36,9 +36,12 @@ endcond:    movi 5, 0x0011                                      // Upper memory
 
             // Calculate masque
             movi 4, 0xfffe                                      // Init masque
+            movi 3, 0x0000                                      // result LSB
 comp_loop:  addi 5, 5, -1                                       // Calculate memory
 
             sw 4, 5, 0x0000                                     // Save masque in memory
+            sw 3, 5, 0x000a                                     // Reset memory
+            sw 3, 5, 0x0014
 
             nand 7, 4, 4                                        // Not 4
             add 6, 7, 7                                         // Shift
