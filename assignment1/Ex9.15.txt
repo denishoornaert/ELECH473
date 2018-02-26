@@ -52,7 +52,7 @@ comp_loop:  addi 5, 5, -1                                       // Calculate mem
             beq 6, 5, comp_end
             movi 6, <? comp_loop ?>
             jalr 6, 6
-            
+
 comp_end:   movi 3, 0x0000                                      // Memory start
             movi 7, 0x0000
             movi 5, 0x0000                                      // result LSB
@@ -77,10 +77,10 @@ comp_end:   movi 3, 0x0000                                      // Memory start
             jalr 2, 2
 
 preloop:    movi 1, 0x0006                                       // Memory start
-      
+
             // Here we have:
             // 1: memory start address
-            // 2: masque 
+            // 2: masque
             // 3: op1
             // 4: (masque and after:) op1 (MSB)
             // 5: use for comparison
@@ -88,7 +88,7 @@ preloop:    movi 1, 0x0006                                       // Memory start
             // 7: counter
 
             // Test for "x2" or "x4" or "x8" or "x16" or "x32"
-            
+
 
 leqx:       movi 2, 0x0011                                       // Memory end
             addi 1, 1, 0x0001                                    // Increment memory
@@ -98,7 +98,7 @@ leqx:       movi 2, 0x0011                                       // Memory end
             movi 4, 0xffff
             beq 3, 4, leqx
 
-            // Bigger than x (reg 4)
+            // Bigger than x (content of reg 4)
             lw 3, 1, 0x000a
             lw 4, 1, 0x0014
 
