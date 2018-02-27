@@ -47,7 +47,7 @@ def convertLabel(sourceFile, destFile):
     newFile = open(destFile, 'w')
 
     for label in dictLabel:
-        contenu = contenu.replace("<? " + label + " ?>", "0x{:04x}".format(dictLabel[label]))
+        contenu = contenu.replace("<? " + label + " ?>", "0x{:04x}".format(dictLabel[label]) + " // Addr: " + label)
 
     newFile.write(contenu)
 
