@@ -1,14 +1,21 @@
 // Objective: reg1 * reg2 = reg4(MSB) reg3(LSB)
 
 // Memory INFO:
-//  1. operand 1
-//  2. operand 2
-//  3. result LSB
-//  4. result MSB
-//  5. counter
-//  6. MSB operand 1 (used for sum)
-// 7 -> 16: masks used for computation (x)
-// 17 -> ...
+// 0x01  [1]: operand 1
+// 0x02  [2]: operand 2
+// 0x03  [3]: result LSB
+// 0x04  [4]: result MSB
+// 0x05  [5]: counter
+// 0x06  [6]: MSB operand 1 (used for sum)
+// 0x07  [7]: masks used for computation (x1024)
+// ....     : ...
+// 0x10 [16]: masks used for computation (x2)
+// 0x11 [17]: LSB result already computed (x1024)
+// ....     : ...
+// 0x1a [26]: LSB result already computed (x2)
+// 0x1b [27]: MSB result already computed (x1024)
+// ....     : ...
+// 0x24 [36]: MSB result already computed (x2)
 
 
             // Init entries
@@ -19,7 +26,7 @@
             // nop
             // nop
 
-            // Test if operand 1 == 0 ?
+            // Test if one operand equals 0
             movi 7, 0x0000
             beq 1, 7, zerodetected
             beq 2, 7, zerodetected
@@ -33,39 +40,34 @@ zerodetected: movi 3, 0x0000                                    // result LSB
 
             // Init
 endcond:    movi 5, 0x0011                                      // Upper memory
+            movi 6, 0x0007                                      // Lower memory
 
-            // Calculate masque
-            movi 4, 0xfffe                                      // Init masque
-            movi 3, 0x0000                                      // result LSB
-comp_loop:  addi 5, 5, -1                                       // Calculate memory
+            // Calculate mask
+            movi 4, 0xfffe                                      // Init mask
+            movi 3, 0x0000                                      // Null value to reset memory
+comp_loop:  addi 5, 5, -1                                       // Decrement to have next memory address
 
-            sw 4, 5, 0x0000                                     // Save masque in memory
-            sw 3, 5, 0x000a                                     // Reset memory
-            sw 3, 5, 0x0014
+            sw 4, 5, 0x0000                                     // Save mask in memory
+            sw 3, 5, 0x000a                                     // Reset memory (LSB)
+            sw 3, 5, 0x0014                                     // Reset memory (MSB)
 
-            nand 7, 4, 4                                        // Not 4
-            add 6, 7, 7                                         // Shift
-            // Op1 = 7 = nand(4) -> nand(7) = nand(nand(4)) = 4
-            nand 6, 6, 6 // Op 2
-            nand 6, 6, 4
-            nand 4, 6, 6
+            // 4: mask
+            nand 7, 4, 4                                        // Reg7 = Not mask
+            add 7, 7, 7                                         // Reg7 = Shift reg7
+            nand 7, 7, 7                                        // Reg7 = Not reg7
+            nand 7, 7, 4                                        // Reg7 = Merge reg7 and reg4 => NAND(reg4, NOT(shift(NOT(reg4))))
+            nand 4, 7, 7                                        // Reg4 = NOT(reg7)
 
-            movi 6, 0x0007
+            beq 6, 5, comp_end                                  // If we have finish to compute all masks
+            movi 7, <? comp_loop ?>                             // Else jump to the next mask
+            jalr 7, 7
 
-            beq 6, 5, comp_end
-            movi 6, <? comp_loop ?>
-            jalr 6, 6
-
-comp_end:   movi 3, 0x0000                                      // Memory start
-            movi 7, 0x0000
-            movi 5, 0x0000                                      // result LSB
+comp_end:   movi 5, 0x0000                                      // result LSB
             movi 6, 0x0000                                      // result MSB
-            add 7, 7, 2                                         // counter
+            add 7, 3, 2                                         // counter = op2 (& reg3 = 0)
 
             // Save context                                     // Memory
             sw 1, 3, 0x0001                                     // 1.  operand 1 (add on every loop)
-
-            // addi 2, 2, -1                                       // Remove 1 to operator 2
             sw 2, 3, 0x0002                                     // 2.  operand 2 (use to check if we could save x2)
 
             sw 5, 3, 0x0003                                     // 3.  result LSB
@@ -73,7 +75,7 @@ comp_end:   movi 3, 0x0000                                      // Memory start
 
             // Prepare input for ex8
             movi 4, 0x0000
-            add 3, 3, 1
+            add 3, 3, 1                                         // Move op1 in reg3
 
             movi 1, 0x0000
             movi 2, <? loop ?>
@@ -83,21 +85,20 @@ preloop:    movi 1, 0x0006                                       // Memory start
 
             // Here we have:
             // 1: memory start address
-            // 2: masque
+            // 2: mask
             // 3: op1
-            // 4: (masque and after:) op1 (MSB)
+            // 4: (mask and after:) op1 (MSB)
             // 5: use for comparison
             // 6: use for comparison
             // 7: counter
 
-            // Test for "x2" or "x4" or "x8" or "x16" or "x32"
             addi 7, 7, -1
 
 leqx:       movi 2, 0x0011                                       // Memory end
             addi 1, 1, 0x0001                                    // Increment memory
             beq 1, 2, endleqx                                    // Have read all address
-            lw 2, 1, 0x0000                                      // Load masque for x
-            nand 3, 7, 2                                         // Apply masque
+            lw 2, 1, 0x0000                                      // Load mask for x
+            nand 3, 7, 2                                         // Apply mask
             movi 4, 0xffff
             beq 3, 4, leqx
 
@@ -113,10 +114,11 @@ leqx:       movi 2, 0x0011                                       // Memory end
             beq 5, 6, leqx
 
             // Decrement counter
-            // reg2 contain the masque = not(value of x)
+            // reg2 contain the mask = not(value of x)
             addi 2, 2, 1                                        // Complement of 2
             add 7, 7, 2
 
+            movi 1, 0x0000
             movi 2, <? loop ?>
             jalr 2, 2
 
@@ -125,8 +127,7 @@ endleqx:    movi 1, 0x0000
             lw 3, 1, 0x0001                                     // LSB for operand 1 x1
             movi 4, 0x0000                                      // MSB for operand 1 x1
 
-loop:       movi 1, 0x0000
-            sw 7, 1, 0x0005                                     // Save increment
+loop:       sw 7, 1, 0x0005                                     // Save increment
 
             beq 1, 7, end                                       // Check end of loop or not
             movi 7, <? addOp ?>
@@ -230,8 +231,8 @@ aft_carr:   add 3, 3, 5
             movi 1, 0x0011                                      // addr base+1 (17)
 savexloop:  addi 1, 1, -1
             movi 2, 0x0006
-            beq 1, 2, after_save                                // End of masque which must be test
-            lw 2, 1, 0x0000                                     // Load masque
+            beq 1, 2, after_save                                // End of mask which must be test
+            lw 2, 1, 0x0000                                     // Load mask
             addi 2, 2, 1                                        // Complement of 2
             add 2, 6, 2
             beq 2, 7, savex
