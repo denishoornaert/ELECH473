@@ -21,28 +21,27 @@
             movi 5, 0x0000                   // else
             movi 3, <? testOnRTwo ?>         // testOnRTwo addr
             jalr 3, 3
-one_ro:     nop
-            movi 5, 0x0001
+
             // if
+one_ro:     movi 5, 0x0001
 
 testOnRTwo: beq 6, 4, one_rt
             movi 6, 0x0000                   // else
             movi 3, <? testOnRSum ?>         // testOnRSum addr
             jalr 3, 3
-one_rt:     nop
-            movi 6, 0x0001
+
             // if
+one_rt:     movi 6, 0x0001
 
 testOnRSum: beq 7, 4, one_rs
             movi 7, 0x0000                   // else
             movi 3, <? end3 ?>               // end3 addr
             jalr 3, 3
-one_rs:     nop
-            movi 7, 0x0001
-            // if
-end3:       nop
 
-            add 5, 5, 6                      // Add MSB of 1 with (MSB of) 2
+            // if
+one_rs:     movi 7, 0x0001
+
+end3:       add 5, 5, 6                      // Add MSB of 1 with (MSB of) 2
             add 5, 5, 7                      // Add MSB of SUM with previous sum
 
             movi 4, 0x0002                   // Mask 0000 0000 0000 0010
@@ -54,5 +53,6 @@ end3:       nop
             jalr 3, 3
 
 carry:      movi 4, 0x0001
+
 afterCarry: add 3, 1, 2
             halt
