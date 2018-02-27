@@ -92,7 +92,7 @@ preloop:    movi 1, 0x0006                                       // Memory start
             // 6: use for comparison
             // 7: counter
 
-            addi 7, 7, -1
+            addi 7, 7, -1                                        // Decrement counter
 
 leqx:       movi 2, 0x0011                                       // Memory end
             addi 1, 1, 0x0001                                    // Increment memory
@@ -227,15 +227,15 @@ aft_carr:   add 3, 3, 5
 
             lw 7, 1, 0x0005                                     // Load counter
             lw 6, 1, 0x0002                                     // Load operator 2
+            movi 1, 0x0011                                      // Upper memory (addr base+1)
+            movi 2, 0x0006                                      // Lower memory
 
-            movi 1, 0x0011                                      // addr base+1 (17)
 savexloop:  addi 1, 1, -1
-            movi 2, 0x0006
             beq 1, 2, after_save                                // End of mask which must be test
-            lw 2, 1, 0x0000                                     // Load mask
-            addi 2, 2, 1                                        // Complement of 2
-            add 2, 6, 2
-            beq 2, 7, savex
+            lw 5, 1, 0x0000                                     // Load mask
+            addi 5, 5, 1                                        // Complement of 2
+            add 5, 6, 5
+            beq 5, 7, savex
             movi 5, <? savexloop ?>                             // else
             jalr 5, 5
 
