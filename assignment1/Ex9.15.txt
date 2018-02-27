@@ -1,14 +1,21 @@
 // Objective: reg1 * reg2 = reg4(MSB) reg3(LSB)
 
 // Memory INFO:
-//  1. operand 1
-//  2. operand 2
-//  3. result LSB
-//  4. result MSB
-//  5. counter
-//  6. MSB operand 1 (used for sum)
-// 7 -> 16: masks used for computation (x)
-// 17 -> ...
+// 0x01  [1]: operand 1
+// 0x02  [2]: operand 2
+// 0x03  [3]: result LSB
+// 0x04  [4]: result MSB
+// 0x05  [5]: counter
+// 0x06  [6]: MSB operand 1 (used for sum)
+// 0x07  [7]: masks used for computation (x1024)
+// ....     : ...
+// 0x10 [16]: masks used for computation (x2)
+// 0x11 [17]: LSB result already computed (x1024)
+// ....     : ...
+// 0x1a [26]: LSB result already computed (x2)
+// 0x1b [27]: MSB result already computed (x1024)
+// ....     : ...
+// 0x24 [36]: MSB result already computed (x2)
 
 
             // Init entries
@@ -19,7 +26,7 @@
             // nop
             // nop
 
-            // Test if operand 1 == 0 ?
+            // Test if one operand equals 0
             movi 7, 0x0000
             beq 1, 7, zerodetected
             beq 2, 7, zerodetected
@@ -34,12 +41,12 @@ zerodetected: movi 3, 0x0000                                    // result LSB
             // Init
 endcond:    movi 5, 0x0011                                      // Upper memory
 
-            // Calculate masque
-            movi 4, 0xfffe                                      // Init masque
+            // Calculate mask
+            movi 4, 0xfffe                                      // Init mask
             movi 3, 0x0000                                      // result LSB
 comp_loop:  addi 5, 5, -1                                       // Calculate memory
 
-            sw 4, 5, 0x0000                                     // Save masque in memory
+            sw 4, 5, 0x0000                                     // Save mask in memory
             sw 3, 5, 0x000a                                     // Reset memory
             sw 3, 5, 0x0014
 
@@ -83,9 +90,9 @@ preloop:    movi 1, 0x0006                                       // Memory start
 
             // Here we have:
             // 1: memory start address
-            // 2: masque
+            // 2: mask
             // 3: op1
-            // 4: (masque and after:) op1 (MSB)
+            // 4: (mask and after:) op1 (MSB)
             // 5: use for comparison
             // 6: use for comparison
             // 7: counter
@@ -96,8 +103,8 @@ preloop:    movi 1, 0x0006                                       // Memory start
 leqx:       movi 2, 0x0011                                       // Memory end
             addi 1, 1, 0x0001                                    // Increment memory
             beq 1, 2, endleqx                                    // Have read all address
-            lw 2, 1, 0x0000                                      // Load masque for x
-            nand 3, 7, 2                                         // Apply masque
+            lw 2, 1, 0x0000                                      // Load mask for x
+            nand 3, 7, 2                                         // Apply mask
             movi 4, 0xffff
             beq 3, 4, leqx
 
@@ -113,7 +120,7 @@ leqx:       movi 2, 0x0011                                       // Memory end
             beq 5, 6, leqx
 
             // Decrement counter
-            // reg2 contain the masque = not(value of x)
+            // reg2 contain the mask = not(value of x)
             addi 2, 2, 1                                        // Complement of 2
             add 7, 7, 2
 
@@ -230,8 +237,8 @@ aft_carr:   add 3, 3, 5
             movi 1, 0x0011                                      // addr base+1 (17)
 savexloop:  addi 1, 1, -1
             movi 2, 0x0006
-            beq 1, 2, after_save                                // End of masque which must be test
-            lw 2, 1, 0x0000                                     // Load masque
+            beq 1, 2, after_save                                // End of mask which must be test
+            lw 2, 1, 0x0000                                     // Load mask
             addi 2, 2, 1                                        // Complement of 2
             add 2, 6, 2
             beq 2, 7, savex
