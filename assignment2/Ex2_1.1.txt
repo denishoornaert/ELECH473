@@ -1,0 +1,89 @@
+                    // Make: <=
+                    MOVI 1, 0x0000
+                    MOVI 2, 0x0001
+                    
+                    // Test if 1 == 2
+                    BEQ 1, 2, isLowerOrEqual
+                    
+                    // Test for -64 (don't exist 64)
+                    MOVI 3, -64
+                    BEQ 1, 3, isLowerOrEqual
+                    BEQ 2, 3, isBigger
+                    
+                    MOVI 3, 0x7fff
+                    MOVI 4, 0x8000
+                    
+                    NAND 5, 4, 1                            // Get MSB 1 bit of op 1
+                    NAND 6, 4, 2                            // Get MSB 1 bit of op 2
+                    
+                    BEQ 5, 3, oneNegative
+                    // First not negative
+                    BEQ 6, 3, twoNegative
+                    // Second not negative
+                    
+                    // 1 & 2 positive !
+                    // Thus reverse 2 (complement of 2)
+                    ADDI 2, 2, -1                           // reg2 = reg2 - 1
+                    NAND 2, 2, 2                            // Not 2
+                    
+                    ADD 5, 1, 2
+                    MOVI 7, <? testLowerOrNot ?>
+                    JALR 7, 7
+
+                    
+oneNegative:        BEQ 3, 5, oneAndTwoNegative
+                    // First negative, second positive
+                    
+                    ADD 5, 2, 1
+                    MOVI 7, <? testLowerOrNot ?>
+                    JALR 7, 7
+
+                    
+                    // First positive, second negative
+twoNegative:        ADD 5, 1, 2
+                    MOVI 7, <? testBiggerOrNot ?>
+                    JALR 7, 7
+                    
+                    // First and second negative
+oneAndTwoNegative:  ADDI 1, 1, -1                           // reg2 = reg2 - 1
+                    // 1 & 2 negative !
+                    // Thus reverse 1 (complement of 2)
+                    NAND 1, 1, 1                            // Not 2
+                    
+                    ADD 5, 1, 2
+                    MOVI 7, <? testBiggerOrNot ?>
+                    JALR 7, 7
+
+
+testLowerOrNot:     NAND 5, 4, 5                            // Get MSB 1 bit of difference
+                    
+                    BEQ 3, 5, diffNegativeLower
+                    // Difference positive
+                    MOVI 7, <? isBigger ?>
+                    JALR 7, 7
+                    
+                    // Difference negative
+diffNegativeLower:  MOVI 7, <? isLowerOrEqual ?>
+                    JALR 7, 7
+
+testBiggerOrNot:    NAND 5, 4, 5                            // Get MSB 1 bit of difference
+                    
+                    BEQ 3, 5, diffNegativeBigger
+                    // Difference positive
+                    MOVI 7, <? isLowerOrEqual ?>
+                    JALR 7, 7
+                    
+                    // Difference negative
+diffNegativeBigger: MOVI 7, <? isBigger ?>
+                    JALR 7, 7
+
+
+
+isBigger:           MOVI 1, 0xdddd
+                    MOVI 7, <? end ?>
+                    JALR 7, 7
+                    
+isLowerOrEqual:     MOVI 1, 0xffff
+end:                halt
+                    
+                    
