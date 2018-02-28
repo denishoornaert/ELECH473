@@ -1,0 +1,302 @@
+// Objective: reg1 * reg2 = reg4(MSB) reg3(LSB)
+
+// Memory INFO:
+//  1. operand 1
+//  2. operand 2
+//  3. result LSB
+//  4. result MSB
+//  5. counter
+//  6. MSB operand 1 (used for sum)
+//  7. Sum of the 15 first LSB (used for sum)
+//  8. 1 MSB of operand 1
+//  9. 1 MSB of result (op 2 of Sum)
+// 10. x2 of Operand 2 LSB
+// 11. x2 of Operand 2 MSB
+// 12. x4 of Operand 2 LSB
+// 13. x4 of Operand 2 MSB
+// 14. x8 of Operand 2 LSB
+// 15. x8 of Operand 2 MSB
+// 16.
+
+
+            // Init entries
+            movi 1, 0x0007                                      // operand 1 LSB (add on every loop)
+            movi 2, 0x0009                                      // operand 2 LSB (use for comparison with counter)
+            // nop
+            // nop
+            // nop
+            // nop
+
+            // Test if operand 1 == 0 ?
+            movi 6, 0x0000
+            beq 1, 6, zerodetected
+            beq 2, 6, zerodetected
+
+            movi 3, <? endcond ?>                               // else : resume
+            jalr 3, 3
+
+zerodetected: movi 3, 0x0000                                    // result LSB
+            movi 4, 0x0000                                      // result MSB
+            halt                                                // if : halt
+
+            // Init
+endcond:    movi 5, 0x0000                                      // result LSB
+            movi 6, 0x0000                                      // result MSB
+            movi 7, 0x0000
+            add 7, 7, 2                                         // counter
+            movi 3, 0x0000                                      // Memory start
+
+            // Save context                                     // Memory
+            sw 1, 3, 0x0001                                     // 1. operand 1 (add on every loop)
+            sw 2, 3, 0x0002                                     // 2. operand 2 (use for comparison with counter)
+            sw 5, 3, 0x0003                                     // 3. result LSB
+            sw 6, 3, 0x0004                                     // 4. result MSB
+            sw 7, 3, 0x0005                                     // 5. counter % TODO (utile ?)
+
+            sw 3, 3, 0x000a                                     // Init 0 for save x2 (LSB)
+            sw 3, 3, 0x000b                                     // Init 0 for save x2 (MSB)
+
+            sw 3, 3, 0x000c                                     // Init 0 for save x4 (LSB)
+            sw 3, 3, 0x000d                                     // Init 0 for save x4 (MSB)
+
+            sw 3, 3, 0x000e                                     // Init 0 for save x8 (LSB)
+            sw 3, 3, 0x000f                                     // Init 0 for save x8 (MSB)
+
+            // [DEBUG] Use only to save the number of "x2" used
+            // sw 3, 3, 0x0010
+
+            // Prepare input for ex8
+            movi 4, 0x0000
+            lw 3, 3, 0x0001
+
+            movi 1, <? loop ?>
+            jalr 1, 1
+
+preloop:    lw 7, 1, 0x0005                                     // Load counter
+            addi 7, 7, -1                                       // Decrement counter
+
+            // Test for "x2" or "x4" or "x8"
+            movi 6, 0xffff
+
+            // Test for "x8"
+            movi 4, 0xfff8
+            nand 4, 7, 4
+            beq 4, 6, leq7
+
+            // Bigger than 7
+            lw 3, 1, 0x000e                                     // LSB of operand 1 x8
+            lw 4, 1, 0x000f                                     // MSB of operand 1 x8
+            // (R3 or R4) == 0
+            nand 5, 3, 3
+            nand 6, 4, 4
+            nand 5, 5, 6
+            movi 6, 0x0000
+            beq 5, 6, leq7                                      // If x8 not yet computed
+
+            addi 7, 7, -7                                       // If compute -> just decrement by 4
+            // Jump to ex8
+            movi 1, <? loop ?>
+            jalr 1, 1
+
+            // Test for "x4"
+leq7:       movi 4, 0xfffc
+            nand 4, 7, 4
+            beq 4, 6, leq3
+
+            // Bigger than 3
+            lw 3, 1, 0x000c                                     // LSB of operand 1 x4
+            lw 4, 1, 0x000d                                     // MSB of operand 1 x4
+            // (R3 or R4) == 0
+            nand 5, 3, 3
+            nand 6, 4, 4
+            nand 5, 5, 6
+            movi 6, 0x0000
+            beq 5, 6, leq3                                      // If x4 not yet computed
+
+            addi 7, 7, -3                                       // If compute -> just decrement by 4
+            // Jump to ex8
+            movi 1, <? loop ?>
+            jalr 1, 1
+
+            // Test for "x2"
+leq3:       movi 4, 0xfffe
+            nand 4, 7, 4
+            beq 4, 6, leq1
+
+            // Bigger than 1
+            lw 3, 1, 0x000a                                     // LSB of operand 1 x2
+            lw 4, 1, 0x000b                                     // MSB of operand 1 x2
+            // (R3 or R4) == 0
+            nand 5, 3, 3
+            nand 6, 4, 4
+            nand 5, 5, 6
+            movi 6, 0x0000
+            beq 5, 6, leq1                                    // If not computed -> Load result x1
+
+            // If computed -> just decrement by 2
+            addi 7, 7, -1                                     // Decrement counter
+
+            // [DEBUG] Record number of use "x2"
+            // lw 5, 1, 0x0010
+            // addi 5, 5, 0x0001
+            // sw 5, 1, 0x0010
+
+            // Jump to ex8
+            movi 1, <? loop ?>
+            jalr 1, 1
+            
+            // Load operand for ex 8
+leq1:       lw 3, 1, 0x0001                                     // LSB for operand 1 x1
+            movi 4, 0x0000                                      // MSB for operand 1 x1
+
+loop:       movi 1, 0x0000
+            sw 7, 1, 0x0005                                     // Save increment
+
+            beq 1, 7, end                                       // Check end of loop or not
+            movi 7, <? addOp ?>
+            jalr 7, 7
+
+            // TODO replace the two next lines by the lines 218-220 (endloop)
+end:        movi 7, <? endloop ?>
+            jalr 7, 7
+
+
+// Begining EX8 ----------------------------------------------------------------
+            // Input of EX8:
+            //     reg4 reg3     + reg6 reg5 = reg4 reg3
+            // operand 1 (or x2) +  result   =  result
+
+addOp:      lw 5, 1, 0x0003                                     // Load LSB result in reg 5
+
+            sw 4, 1, 0x0006                                     // Save MSB of operand 1
+            movi 4, 0x0000
+
+            // Add first 15 bits
+            movi 2, 0x7fff                                      // Mask
+            nand 4, 3, 2                                        // Isolate 15 bits
+            nand 4, 4, 4                                        // Reverse to and
+            nand 6, 5, 2                                        // Isolate 15 bits
+            nand 6, 6, 6                                        // Reverse to and
+
+            add 7, 4, 6                                         // add Reg3 and Reg5 in Reg7
+            sw 7, 1, 0x0007                                     // save result in memory
+
+            // MSB of Reg3 and Reg5
+            movi 2, 0x8000                                      // Mask
+            nand 4, 3, 2                                        // Isolate 1 bit
+            nand 4, 4, 4                                        // Reverse to and
+            nand 6, 5, 2                                        // Isolate 1 bit
+            nand 6, 6, 6                                        // Reverse to and
+            sw 4, 1, 0x0008                                     // Save word in 3
+            sw 6, 1, 0x0009                                     // Save word in 4
+
+            // MSB of Reg3+Reg4
+            lw 4, 1, 0x0007                                     // Load result of add 15 bits
+            nand 7, 4, 2                                        // Get the MSB of A+B
+            nand 7, 7, 7                                        // Reverse
+
+            // Now we have :
+            //    REG1 : Memory start
+            //    REG2 : Mask 0x8000
+            //    REG3 : LSB of val1
+            //    REG4 : add 15B + 15B
+            //    REG5 : LSB of val2
+            //    REG6 : MSB bit of REG5
+            //    REG7 : MSB of REG3+REG5
+
+            // REG4: Get the MSB bit of REG3
+            nand 4, 3, 2                                        // Mask
+            nand 4, 4, 4                                        // Reverse to and
+
+            // Condition
+test_one:   beq 4, 2, one_rone
+            movi 4, 0x0000                                      // Else
+            movi 1, <? test_two ?>                              // test_two addr
+            jalr 1, 1
+
+one_rone:   movi 4, 0x0001                                      // If
+
+test_two:   nop
+            beq 6, 2, one_two
+            movi 6, 0x0000                                      // Else
+            movi 1, <? test_sum ?>                              // test_sum addr
+            jalr 1, 1
+
+one_two:    movi 6, 0x0001                                      // If
+
+test_sum:   nop
+            beq 7, 2, one_sum
+            movi 7, 0x0000                                      // Else
+            movi 1, <? sec_part ?>                              // sec_part addr
+            jalr 1,1
+
+one_sum:    movi 7, 0x0001                                      // If
+
+sec_part:   add 4, 4, 6
+            add 4, 4, 7
+
+            movi 2, 0x0002
+            nand 4, 4, 2
+            movi 2, 0xfffd
+            beq 2, 4, carr_inc
+            movi 2, 0x0000
+            movi 1, <? aft_carr ?>                              // aft_carr addr
+            jalr 1, 1
+
+carr_inc:   movi 2, 0x0001
+
+aft_carr:   add 3, 3, 5
+
+            movi 1, 0x0000
+            lw 4, 1, 0x0006                                     // Load MSB of operand 1
+            lw 5, 1, 0x0004                                     // Load MSB of operand 2
+            add 4, 4, 5                                         // Sum of the two MSB
+            add 4, 4, 2                                         // Add carry
+
+            // Rappel: reg4 reg3 + reg6 reg5 = reg4 reg3
+// Ending   EX8 ----------------------------------------------------------------
+
+            sw 3, 1, 0x0003                                     // Save result (LSB)
+            sw 4, 1, 0x0004                                     // Save result (MSB)
+
+            lw 7, 1, 0x0005                                     // Load counter
+            lw 6, 1, 0x0002                                     // Load number of loop
+            addi 6, 6, -1                                       // Minus 1
+            beq 6, 7, savex2
+
+            addi 6, 6, -2                                       // Minus 3
+            beq 6, 7, savex4
+
+            addi 6, 6, -4                                       // Minus 7
+            beq 6, 7, savex8
+
+            movi 6, <? afterSave ?>
+            jalr 6, 6
+
+            // Bigger than 1
+savex2:     sw 3, 1, 0x000a                                     // Save x2 result (LSB)
+            sw 4, 1, 0x000b                                     // Save x2 result (MSB)
+            movi 6, <? afterSave ?>
+            jalr 6, 6
+
+            // Bigger than 3
+savex4:     sw 3, 1, 0x000c                                     // Save x4 result (LSB)
+            sw 4, 1, 0x000d                                     // Save x4 result (MSB)
+            movi 6, <? afterSave ?>
+            jalr 6, 6
+
+            // Bigger than 7
+savex8:     sw 3, 1, 0x000e                                     // Save x8 result (LSB)
+            sw 4, 1, 0x000f                                     // Save x8 result (MSB)
+
+afterSave:  movi 6, <? preloop ?>                               // preloop flag addr
+            jalr 6, 6
+            
+endloop:    lw 3, 1, 0x0003
+            lw 4, 1, 0x0004
+
+            // [DEBUG] Use to print/output the number of "x2" use
+            // lw 3, 1, 0x0010
+            // movi 4, 0x0000
+
+            halt

@@ -1,0 +1,13 @@
+    nop
+    nop
+    nop
+    nop
+    add 6, 6, 6    // Left shift register 6
+    movi 2, 0x8000 // Mask
+    movi 3, 0x7fff // Mask
+    nand 7, 5, 2   // Apply mask
+    add 5, 5, 5    // Left shift register 5
+    beq 7, 3, incr // If 7 equals mask
+    halt
+incr: addi 6, 6, 1
+    halt

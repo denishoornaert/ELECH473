@@ -1,0 +1,4 @@
+	nop
+	nop
+	add 5, 5, 5
+	halt
