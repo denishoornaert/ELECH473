@@ -41,7 +41,7 @@ def convertLabel(sourceFile, destFile):
 
         # Double if movi
         splitLine = line.split(" ")
-        if(splitLine[0] == "movi"):
+        if(splitLine[0].lower() == "movi"):
             counter += 1
 
     newFile = open(destFile, 'w')
