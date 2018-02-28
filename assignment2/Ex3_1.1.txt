@@ -1,0 +1,19 @@
+// Objective: reg1 * reg2 = reg4(MSB) reg3(LSB) = 
+
+                movi 1, 0x0002
+                movi 2, 0x0003
+        
+                movi 7, 0x0000
+                beq 1, 7, zerodetected
+                beq 2, 7, zerodetected
+
+                movi 3, <? endcond ?>                                 // Else : resume
+                jalr 3, 3
+
+zerodetected:   movi 3, 0x0000                                      // Result LSB
+                movi 4, 0x0000                                        // Result MSB
+                halt                                                  // If : halt
+                
+                
+                
+                

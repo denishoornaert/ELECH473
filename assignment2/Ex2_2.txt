@@ -1,0 +1,20 @@
+					// Make: <=
+					
+					MOVI 1, 0x0000
+					MOVI 2, 0x0001
+					
+					// Test if reg1 == reg2
+					BEQ 1, 2, isLowerOrEqual
+					
+					// reg1 <= reg2
+					BL 1, 2, isLowerOrEqual
+					
+					
+isBigger:           MOVI 1, 0xdddd
+					MOVI 7, <? end ?>
+					JALR 7, 7
+					
+isLowerOrEqual:     MOVI 1, 0xffff
+end:                halt
+					
+					

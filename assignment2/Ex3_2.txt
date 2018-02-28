@@ -1,0 +1,10 @@
+movi 1, 0xffff
+movi 2, 0xffff
+
+mul 4, 1, 2
+
+movi 7, 0x0000
+add 5, 7, 4    // Save reg4 in reg5
+add 4, 7, 3
+add 3, 7, 5
+halt
