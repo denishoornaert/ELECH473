@@ -68,17 +68,16 @@ one_sum:    addi 4, 4, 0x0001                                   // Increment
 
 sec_part:   movi 2, 0x0002
             nand 4, 4, 2
-            nand 4, 4, 4
-            beq 2, 4, car_addr
-            movi 2, 0x0000
+            nand 6, 4, 4
+
+            lw 4, 1, 0x0001                                     // Load MSB of operand 1
+            lw 5, 1, 0x0002                                     // Load MSB of operand 2
+            add 4, 4, 5
+
+            beq 2, 6, car_addr
             movi 5, <? msb_part ?>                              // aft_carr addr
             jalr 5, 5
 
-car_addr:   movi 2, 0x0001
+car_addr:   addi 4, 4, 0x0001
 
-msb_part:   lw 4, 1, 0x0001                                     // Load MSB of operand 1
-            lw 5, 1, 0x0002                                     // Load MSB of operand 2
-            add 4, 4, 5
-            add 4, 4, 2
-
-            halt
+msb_part:   halt
