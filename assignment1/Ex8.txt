@@ -12,9 +12,7 @@
 
             // Save the MSB of both values in memory.
             sw 4, 1, 0x0001
-            sw 6, 1, 0x0002                                     
-            movi 4, 0x0000
-            movi 6, 0x0000
+            sw 6, 1, 0x0002
 
             // To know if there exist a carry, we isolate the last bit (16).
             // Then we apply the addition on 15 bits.
@@ -23,7 +21,7 @@
             nand 4, 4, 4                                        // Reverse to and
             nand 6, 5, 2                                        // Isolate 15 bits
             nand 6, 6, 6                                        // Reverse to and
-            add 7, 4, 6                                         // add Reg3 and Reg5 in Reg7
+            add 7, 4, 6                                         // add Reg4 and Reg6 in Reg7
 
             // We will isolate the last bit which represent the last carry.
             // This bit is saved in register 7.
@@ -38,11 +36,11 @@
             // Now we have :
             //    REG1 : Memory start
             //    REG2 : Mask 0x8000
-            //    REG3 : LSB of val1
-            //    REG4 : 16th bit of val1
-            //    REG5 : LSB of val2
-            //    REG6 : 16th bit of val2
-            //    REG7 : MSB of REG3+REG5 (15 bits)
+            //    REG3 : LSB of val1 (16)
+            //    REG4 : 16th bit of val1 (1)
+            //    REG5 : LSB of val2 (16)
+            //    REG6 : 16th bit of val2 (1)
+            //    REG7 : 16th bit of REG4 + Reg6 (1)
 
             // Condition
 test_one:   beq 4, 2, one_rone
