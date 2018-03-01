@@ -39,10 +39,10 @@
             //    REG1 : Memory start
             //    REG2 : Mask 0x8000
             //    REG3 : LSB of val1
-            //    REG4 : add 15B + 15B
+            //    REG4 : 16th bit of val1
             //    REG5 : LSB of val2
-            //    REG6 : MSB bit of REG5
-            //    REG7 : MSB of REG3+REG5
+            //    REG6 : 16th bit of val2
+            //    REG7 : MSB of REG3+REG5 (15 bits)
 
             // Condition
 test_one:   beq 4, 2, one_rone
