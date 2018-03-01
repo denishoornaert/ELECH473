@@ -1,8 +1,3 @@
-            // nop x 8
-            // movi 3, 0xffff                                   // Operand 1 (LSB)
-            // movi 4, 0x0000                                   // Operand 1 (MSB)
-            // movi 5, 0xffff                                   // Operand 2 (LSB)
-            // movi 6, 0x0000                                   // Operand 2 (MSB)
             nop
             nop
             nop
@@ -12,34 +7,31 @@
             nop
             nop
 
-            // start memory address
+            // Memory starting point.
             movi 1, 0x0001
 
-            // Save Reg4 and Reg6 in memory
-            sw 4, 1, 0x0001                                     // Save MSB of operand 1
-            sw 6, 1, 0x0002                                     // Save MSB of operand 2
+            // Save the MSB of both values in memory.
+            sw 4, 1, 0x0001
+            sw 6, 1, 0x0002                                     
             movi 4, 0x0000
             movi 6, 0x0000
 
-            // Add first 15 bits
+            // To know if there exist a carry, we isolate the last bit (16).
+            // Then we apply the addition on 15 bits.
             movi 2, 0x7fff                                      // Mask
             nand 4, 3, 2                                        // Isolate 15 bits
             nand 4, 4, 4                                        // Reverse to and
             nand 6, 5, 2                                        // Isolate 15 bits
             nand 6, 6, 6                                        // Reverse to and
-
             add 7, 4, 6                                         // add Reg3 and Reg5 in Reg7
 
-            // MSB of Reg3 and Reg5
+            // We will isolate the last bit which represent the last carry.
+            // This bit is saved in register 7.
             movi 2, 0x8000                                      // Mask
             nand 4, 3, 2                                        // Isolate 1 bit
             nand 4, 4, 4                                        // Reverse to and
             nand 6, 5, 2                                        // Isolate 1 bit
             nand 6, 6, 6                                        // Reverse to and
-            // sw 4, 1, 0x0003                                     // Save word in 3
-            // sw 6, 1, 0x0004                                     // Save word in 4
-
-            // MSB of Reg3+Reg4
             nand 7, 7, 2                                        // Get the MSB of A+B
             nand 7, 7, 7                                        // Reverse
 
