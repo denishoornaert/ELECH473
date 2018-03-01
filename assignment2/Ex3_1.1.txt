@@ -10,10 +10,10 @@
                 movi 3, <? endcond ?>                                 // Else : resume
                 jalr 3, 3
 
-zerodetected:   movi 3, 0x0000                                      // Result LSB
+zerodetected:   movi 3, 0x0000                                        // Result LSB
                 movi 4, 0x0000                                        // Result MSB
                 halt                                                  // If : halt
                 
-                
+endcond:        halt // TODO
                 
                 
