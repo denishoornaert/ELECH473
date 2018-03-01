@@ -6,8 +6,6 @@
             nop
             nop
             nop
-            // movi 3, 0000
-            // movi 4, ffff
 
             // Memory starting point.
             movi 1, 0x0000
@@ -47,28 +45,26 @@
             //    REG6 : 16th bit of val2 (1)
             //    REG7 : 16th bit of REG4 + Reg6 (1)
 
-            movi 4, 0x0000                                      // Sum of all MSB bit
-
+            
             // Condition
 test_one:   beq 4, 2, one_rone
+            movi 4, 0x0000
             movi 5, <? test_two ?>                              // test_two addr
             jalr 5, 5
 
-one_rone:   addi 4, 1, 0x0001                                   // Increment
+one_rone:   movi 4, 0x0001
 
-test_two:   nop
-            beq 6, 2, one_two
+test_two:   beq 6, 2, one_two
             movi 5, <? test_sum ?>                              // test_sum addr
             jalr 5, 5
 
-one_two:    addi 4, 1, 0x0001                                   // Increment
+one_two:    addi 4, 4, 0x0001                                   // Increment
 
-test_sum:   nop
-            beq 7, 2, one_sum
+test_sum:   beq 7, 2, one_sum
             movi 5, <? sec_part ?>                              // sec_part addr
             jalr 5, 5
 
-one_sum:    addi 4, 1, 0x0001                                   // Increment
+one_sum:    addi 4, 4, 0x0001                                   // Increment
 
 sec_part:   movi 2, 0x0002
             nand 4, 4, 2
