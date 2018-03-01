@@ -69,18 +69,18 @@ test_sum:   beq 7, 2, one_sum
 
 one_sum:    addi 4, 4, 0x0001                                   // Increment
 
-sec_part:   movi 2, 0x0002
-            nand 4, 4, 2
-            nand 6, 4, 4
+sec_part:   movi 2, 0x0002                                      // Mask to see if the second bit is set to 1
+            nand 4, 4, 2                                        // Apply mask
+            nand 6, 4, 4                                        // And
 
             lw 4, 1, 0x0001                                     // Load MSB of operand 1
             lw 5, 1, 0x0002                                     // Load MSB of operand 2
-            add 4, 4, 5
+            add 4, 4, 5                                         // Make some
 
-            beq 2, 6, car_addr
-            movi 5, <? msb_part ?>                              // aft_carr addr
+            beq 2, 6, car_addr                                  // If second bit of "carry" sum is set to 1, increment
+            movi 5, <? msb_part ?>                              // In other case: jump to the end
             jalr 5, 5
 
-car_addr:   addi 4, 4, 0x0001
+car_addr:   addi 4, 4, 0x0001                                   // Increment the result
 
 msb_part:   halt
