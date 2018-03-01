@@ -1,21 +1,30 @@
+// Authors : Denis Hoornaert, Nathan Liccardo and Remy Detobel
 // Objective: reg4(MSB) reg3(LSB) = reg1 * reg2
+// The present code performs the multiplication of two unsigned integers by adding x times the content of the register 1
+// to the result of the previous addition (where x is the content of the register 2). Furthermore, in order to reduce the
+// number of additions (i.e. the number of iterations), the implemented algorithm saves the result of intermediate
+// additions (dynamic programming). The present code is divided in 7 different parts.
 
-// Memory INFO:
-// 0x01  [1]: operand 1
-// 0x02  [2]: operand 2
-// 0x03  [3]: result LSB
-// 0x04  [4]: result MSB
-// 0x05  [5]: counter
-// 0x06  [6]: MSB operand 1 (used for sum)
-// 0x07  [7]: masks used for computation (x1024)
-// ....     : ...
-// 0x10 [16]: masks used for computation (x2)
-// 0x11 [17]: LSB result already computed (x1024)
-// ....     : ...
-// 0x1a [26]: LSB result already computed (x2)
-// 0x1b [27]: MSB result already computed (x1024)
-// ....     : ...
-// 0x24 [36]: MSB result already computed (x2)
+// Memory organisation:
+// +-----------+-----------------------------------------+
+// | addr      | content                                 |
+// +-----------+-----------------------------------------+
+// | 0x01  [1] | operand 1                               |
+// | 0x02  [2] | operand 2                               |
+// | 0x03  [3] | result LSB                              |
+// | 0x04  [4] | result MSB                              |
+// | 0x05  [5] | counter                                 |
+// | 0x06  [6] | MSB of the operand 1 (used for sum)     |
+// | 0x07  [7] | mask used for computation (x1024)       |
+// | ....      | ...                                     |
+// | 0x10 [16] | mask used for computation (x2)          |
+// | 0x11 [17] | LSB of an intermediate addition (x1024) |
+// | ....      | ...                                     |
+// | 0x1a [26] | LSB of an intermediate addition (x2)    |
+// | 0x1b [27] | MSB of an intermediate addition (x1024) |
+// | ....      | ...                                     |
+// | 0x24 [36] | MSB of an intermediate addition (x2)    |
+// +-----------+-----------------------------------------+
 
 
             // Init entries
@@ -28,7 +37,7 @@
 
 // PART 1 :
 //  Test whether at least one operand is equal to 0.
-//  If yes, then we know for sure that the result is then 0. Otherwise, the program resumes.
+//  If yes, we know for sure that the result is then 0. Otherwise, the program resumes.
 
             movi 7, 0x0000
             beq 1, 7, zerodetected
@@ -47,7 +56,7 @@ endcond:    movi 5, 0x0011                                        // Upper memor
 
 // PART 2 :
 //  The following part computes all the masks that will be used during the part 4
-//  (check part 3 for futher information) and stores them in memory from cell 7 to cell 16 included.
+//  (see part 4 for further information) and stores them in memory from cell 7 to cell 16 included.
 //  Notice that each mask has an associated value which is typically its opposite (7 : 0xfc00 -> 1023).
 //  Even though the final result is always the same (7 : 0xfc00, 8 : 0xfe00, 9 : 0xff00, ..., 15 : 0xfffc, 16 : 0xfffe),
 //  it has been decided to generalize the code so that the speed-up factor can be easily increased or decreased
@@ -75,8 +84,8 @@ comp_loop:  addi 5, 5, -1                                         // Decrement t
 
 // PART 3 :
 //  The following part consist simply in saving the context and setting up the registers
-//  for the first addition which is done through the utilization of the exercise 8.
-//  At the end of this phase, the program skips the phase 4 (preloop) as no checking or pre-computation is required.
+//  for the first addition (which is done by using the exercise 8).
+//  At the end of this phase, the program skips the phase 4 (preloop) as no checking or pre-computation is required yet.
 
 comp_end:   movi 5, 0x0000                                        // Result LSB
             movi 6, 0x0000                                        // Result MSB
@@ -97,11 +106,11 @@ comp_end:   movi 5, 0x0000                                        // Result LSB
             jalr 2, 2
 
 // PART 4 :
-//  The aim of this phase is to check and do the pre-computation needed before any
-//  loop entering in order to benefit from(of?) the dynamic programming.
+//  The aim of this phase is to check and to do the pre-computation needed before any
+//  loop entering in order to benefit of the dynamic programming.
 //  Roughly speaking, it consists in a loop that for each mask generated during the part 2:
 //      1.  Checks using the mask that the counter is bigger than the value associated to the mask.
-//          If yes, the program resume to step 2 (see below).
+//          If yes, the program resumes in step 2 (see below).
 //          Otherwise, the program re-enter the loop with the following mask.
 //      2.  Checks whether a pre-computation for the associated value of the mask plus 1 is available.
 //          If yes, the program then considers the precomputed value as the next addition input
@@ -121,12 +130,12 @@ preloop:    movi 1, 0x0006                                       // Memory start
             // 6: use for comparison
             // 7: counter
 
-            addi 7, 7, -1                                        // Decrement the counter
+            addi 7, 7, -1                                        // Decrement of the counter
 
-leqx:       movi 2, 0x0011                                       // Memory end
-            addi 1, 1, 0x0001                                    // Increment memory
+leqx:       movi 2, 0x0011                                       // 'Mask memory' last address
+            addi 1, 1, 0x0001                                    // Increment of the memory address pointed
             beq 1, 2, endleqx                                    // Check whether all address have been read
-            lw 2, 1, 0x0000                                      // Load mask for xX
+            lw 2, 1, 0x0000                                      // Load the next mask (xX)
             nand 3, 7, 2                                         // Apply the mask
             movi 4, 0xffff
             beq 3, 4, leqx
@@ -157,8 +166,9 @@ endleqx:    movi 1, 0x0000
             movi 4, 0x0000                                      // MSB for operand 1 x1
 
 // PART 5 :
-//  This step simply checks whether the counter is bigger than 0, if it is the case,
-//  the program halts otherwise, the program performs an addition using the operands provided.
+//  This step simply checks whether the counter is bigger than 0.
+//  If it is the case, the program halts.
+//  Otherwise, the program performs an addition using the operands provided.
 //  For further information about the addition algorithm used see the exercise 8 and its documentation. (TODO delete after having completed the ex8's documentation)
 
 loop:       sw 7, 1, 0x0005                                     // Save increment
@@ -234,7 +244,7 @@ test_sum:   beq 7, 2, one_sum
 one_sum:    addi 4, 4, 0x0001                                   // Increment
 
 sec_part:   movi 2, 0x0002
-      
+
             nand 4, 4, 2
             nand 6, 4, 4
 
@@ -253,8 +263,8 @@ carr_inc:   addi 4, 4, 0x0001
 // Ending   EX8 ----------------------------------------------------------------
 
 // PART 6 :
-//  The aim of this step is to save the result (LSB+MSB), load what has been saved
-//  before entering the addition (counter & operand 2) and sets two registers for the next part.
+//  The aim of this step is to save the result (LSB+MSB), load/recover what has been saved (i.e. the 'context')
+//  before entering the addition (counter & operand 2) and set up two registers for the next part.
 
 aft_ex:     sw 3, 1, 0x0003                                     // Save result (LSB)
             sw 4, 1, 0x0004                                     // Save result (MSB)
@@ -265,10 +275,10 @@ aft_ex:     sw 3, 1, 0x0003                                     // Save result (
             movi 2, 0x0006                                      // Lower memory
 
 // PART 7 :
-//  In this step, the pre-computations are saved as soon as they are computed during the run time.
+//  In this step, the pre-computations are saved as soon as they are computed.
 //  In order to know when to store the value, the counter is analyzed. For instance, at the end of
-//  the second loop (counter = 2) the result of x2 is saved, x4 is saved at the end of the third
-//  loop (counter = 4) and so on until the counter reaches 1024.
+//  the second loop (where counter = 2) the result of x2 is saved, x4 is saved at the end of the third
+//  loop (where counter = 4) and so on until the counter reaches 1024.
 
 savexloop:  addi 1, 1, -1
             beq 1, 2, after_save                                // End of mask which must be tested
