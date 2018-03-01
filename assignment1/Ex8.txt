@@ -6,9 +6,11 @@
             nop
             nop
             nop
+            // movi 3, 0000
+            // movi 4, ffff
 
             // Memory starting point.
-            movi 1, 0x0001
+            movi 1, 0x0000
 
             // Save the MSB of both values in memory.
             sw 4, 1, 0x0001
@@ -33,6 +35,9 @@
             nand 7, 7, 2                                        // Get the MSB of A+B
             nand 7, 7, 7                                        // Reverse
 
+            // Addition of LSB
+            add 3, 3, 5
+
             // Now we have :
             //    REG1 : Memory start
             //    REG2 : Mask 0x8000
@@ -42,47 +47,40 @@
             //    REG6 : 16th bit of val2 (1)
             //    REG7 : 16th bit of REG4 + Reg6 (1)
 
+            movi 4, 0x0000                                      // Sum of all MSB bit
+
             // Condition
 test_one:   beq 4, 2, one_rone
-            movi 4, 0x0000                                      // Else
-            movi 1, <? test_two ?>                              // test_two addr
-            jalr 1, 1
+            movi 5, <? test_two ?>                              // test_two addr
+            jalr 5, 5
 
-one_rone:   movi 4, 0x0001                                      // If
+one_rone:   addi 4, 1, 0x0001                                   // Increment
 
 test_two:   nop
             beq 6, 2, one_two
-            movi 6, 0x0000                                      // Else
-            movi 1, <? test_sum ?>                              // test_sum addr
-            jalr 1, 1
+            movi 5, <? test_sum ?>                              // test_sum addr
+            jalr 5, 5
 
-one_two:    movi 6, 0x0001                                      // If
+one_two:    addi 4, 1, 0x0001                                   // Increment
 
 test_sum:   nop
             beq 7, 2, one_sum
-            movi 7, 0x0000                                      // Else
-            movi 1, <? sec_part ?>                              // sec_part addr
-            jalr 1,1
+            movi 5, <? sec_part ?>                              // sec_part addr
+            jalr 5, 5
 
-one_sum:    movi 7, 0x0001                                      // If
+one_sum:    addi 4, 1, 0x0001                                   // Increment
 
-sec_part:   add 4, 4, 6
-            add 4, 4, 7
-
-            movi 2, 0x0002
+sec_part:   movi 2, 0x0002
             nand 4, 4, 2
-            movi 2, 0xfffd
+            nand 4, 4, 4
             beq 2, 4, car_addr
             movi 2, 0x0000
-            movi 1, <? aft_carr ?>                              // aft_carr addr
-            jalr 1, 1
+            movi 5, <? msb_part ?>                              // aft_carr addr
+            jalr 5, 5
 
 car_addr:   movi 2, 0x0001
 
-aft_carr:   add 3, 3, 5
-
-msb_part:   movi 1, 0x0001
-            lw 4, 1, 0x0001                                     // Load MSB of operand 1
+msb_part:   lw 4, 1, 0x0001                                     // Load MSB of operand 1
             lw 5, 1, 0x0002                                     // Load MSB of operand 2
             add 4, 4, 5
             add 4, 4, 2
