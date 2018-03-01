@@ -46,22 +46,25 @@
             //    REG7 : 16th bit of REG4 + Reg6 (1)
 
             
-            // Condition
+            // Conditionnal part for the carry. Get the result of adding 
+            // REG4 + REG6 + REG7 on 2 bits. Then isolate the second bit which
+            // represent the carry. Add this carry to the MSB part. All those 
+            // Computations are made in register 4.
 test_one:   beq 4, 2, one_rone
             movi 4, 0x0000
-            movi 5, <? test_two ?>                              // test_two addr
+            movi 5, <? test_two ?>
             jalr 5, 5
 
 one_rone:   movi 4, 0x0001
 
 test_two:   beq 6, 2, one_two
-            movi 5, <? test_sum ?>                              // test_sum addr
+            movi 5, <? test_sum ?>
             jalr 5, 5
 
 one_two:    addi 4, 4, 0x0001                                   // Increment
 
 test_sum:   beq 7, 2, one_sum
-            movi 5, <? sec_part ?>                              // sec_part addr
+            movi 5, <? sec_part ?>
             jalr 5, 5
 
 one_sum:    addi 4, 4, 0x0001                                   // Increment
