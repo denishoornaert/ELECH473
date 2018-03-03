@@ -61,7 +61,8 @@ endcond:    nop
             movi 2, <? loop ?>
             jalr 2, 2
 
-preloop:    addi 7, 7, -1                                         // Decrement of the counter
+preloop:    addi 5, 1, 1                                          // movi 5, 0x0001 in ONE instruction
+            sub 7, 7, 5                                           // Decrement of the counter
             
             beq 7, 1, end
 
@@ -74,15 +75,16 @@ preloop:    addi 7, 7, -1                                         // Decrement o
             // 6: use for comparison
             // 7: counter
 
-            movi 2, 0x000a                                       // Counter number of shift
-            movi 6, 0x03ff                                       // Test bigger
+            movi 2, 0x000a                                        // Counter number of shift
+            movi 6, 0x03ff                                        // Test bigger
 
-            lw 3, 1, 0x0001                                      // LSB for operand 1 x1
-            movi 4, 0x0000                                       // MSB for operand 1 x1
+            lw 3, 1, 0x0001                                       // LSB for operand 1 x1
+            movi 4, 0x0000                                        // MSB for operand 1 x1
 
 testBig:    beq 1, 2, loop
             bg 7, 6, bigger
-            addi 2, 2, -1
+            addi 5, 1, 1                                          // movi 5, 0x0001 in ONE instruction :)
+            sub 2, 2, 5
             shifti 6, 6, -1
             movi 5, <? testBig ?>
             jalr 5, 5
@@ -91,8 +93,8 @@ bigger:     movi 6, 0x0001
             shl 5, 6, 2
             sub 7, 7, 5
             addi 7, 7, 1
-nextShl:    beq 2, 1, loop                                       // If we made all shift
-            addi 2, 2, -1
+nextShl:    beq 2, 1, loop                                        // If we made all shift
+            sub 2, 2, 6
             shl 4, 4, 6
             shl 3, 3, 6, shiftCarry
             movi 5, <? nextShl ?>
@@ -103,13 +105,13 @@ shiftCarry: addi 4, 4, 0x0001
             jalr 5, 5
 
 
-loop:       beq 1, 7, end                                       // Check end of loop or not
+loop:       beq 1, 7, end                                         // Check end of loop or not
             movi 2, <? addOp ?>
             jalr 2, 2
 
-end:        lw 3, 1, 0x0003                                     // Load result
+end:        lw 3, 1, 0x0003                                       // Load result
             lw 4, 1, 0x0004
-            halt                                                // Halt program
+            halt                                                  // Halt program
 
 
 // Begining EX8 ----------------------------------------------------------------
@@ -117,18 +119,18 @@ end:        lw 3, 1, 0x0003                                     // Load result
             //      reg4 reg3 = reg4 reg3 + reg6 reg5
             //      result    = operand 1 (or x2, x4, x9, ..., x1024) + result
 
-addOp:      lw 5, 1, 0x0003                                     // Load LSB result in reg 5
-            lw 6, 1, 0x0004                                     // Load MSB of operand 2
+addOp:      lw 5, 1, 0x0003                                       // Load LSB result in reg 5
+            lw 6, 1, 0x0004                                       // Load MSB of operand 2
 
             add 4, 4, 6
             add 3, 3, 5, carr_inc
-            movi 5, <? aft_ex ?>                                // aft_ex addr
+            movi 5, <? aft_ex ?>                                  // aft_ex addr
             jalr 5, 5
             
 carr_inc:   addi 4, 4, 0x0001
 
-aft_ex:     sw 3, 1, 0x0003                                     // Save result (LSB)
-            sw 4, 1, 0x0004                                     // Save result (MSB)
+aft_ex:     sw 3, 1, 0x0003                                       // Save result (LSB)
+            sw 4, 1, 0x0004                                       // Save result (MSB)
 
-            movi 6, <? preloop ?>                               // preloop flag addr
+            movi 6, <? preloop ?>                                 // preloop flag addr
             jalr 6, 6
