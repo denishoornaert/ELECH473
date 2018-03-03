@@ -1,0 +1,19 @@
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop
+        nop    
+        
+        movi 1, 0xffff             // Operand 1
+        movi 2, 0xffff             // Operand 2
+        movi 3, 0x0000             // Result
+        movi 4, 0x0000             // Carry
+        
+        add 3, 1, 2, carry
+        movi 4, 0xabab             // Random value to check that we are here or not
+        halt
+
+carry:  addi 4, 4, 0x0001
+        halt
