@@ -169,7 +169,6 @@ endleqx:    movi 1, 0x0000
 //  This step simply checks whether the counter is bigger than 0.
 //  If it is the case, the program halts.
 //  Otherwise, the program performs an addition using the operands provided.
-//  For further information about the addition algorithm used see the exercise 8 and its documentation. (TODO delete after having completed the ex8's documentation)
 
 loop:       sw 7, 1, 0x0005                                     // Save increment
 
