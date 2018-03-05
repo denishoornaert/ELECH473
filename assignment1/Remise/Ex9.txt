@@ -84,7 +84,6 @@ comp_loop:  addi 5, 5, -1                                         // Decrement t
             beq 6, 5, comp_end                                    // If we have finish to compute all masks
 
             movi 7, 0x0018 // Addr: comp_loop                               // Else jump to the next mask
->>>>>>> 6cf258cee7594975f492ffb18965f52c1b5b40ea
             jalr 7, 7
 
 // PART 3 :
