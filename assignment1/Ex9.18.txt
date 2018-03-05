@@ -28,12 +28,13 @@
 
 
             // Init entries
-            movi 1, 0xffff                                        // Operand 1 LSB (used as base for every addition)
-            movi 2, 0x0007                                        // Operand 2 LSB (used for comparison with counter)
-            // nop
-            // nop
-            // nop
-            // nop
+            // Instructions to local test
+            // movi 1, 0xffff                                        // Operand 1 LSB (used as base for every addition)
+            // movi 2, 0x0007                                        // Operand 2 LSB (used for comparison with counter)
+            nop
+            nop
+            nop
+            nop
 
 // PART 1 :
 //  Test whether at least one operand is equal to 0.
