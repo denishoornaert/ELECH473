@@ -1,4 +1,5 @@
-// Authors : Denis Hoornaert, Nathan Liccardo and Remy Detobel
+// Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
+
             nop
             nop
             nop
