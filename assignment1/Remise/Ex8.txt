@@ -1,0 +1,87 @@
+// Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
+
+            nop
+            nop
+            nop
+            nop
+            nop
+            nop
+            nop
+            nop
+
+            // Memory starting point.
+            movi 1, 0x0000
+
+            // Save the MSB of both values in memory.
+            sw 4, 1, 0x0001
+            sw 6, 1, 0x0002
+
+            // To know if there exists a carry, we isolate the last bit (the 16th).
+            // Then we apply the addition on the 15 remaining bits.
+            movi 2, 0x7fff                                      // Mask
+            nand 4, 3, 2                                        // Isolation of the 15 bits
+            nand 4, 4, 4                                        // Reverse to obtain the result of a 'and'
+            nand 6, 5, 2                                        // Isolation of the 15 bits
+            nand 6, 6, 6                                        // Reverse to obtain the result of a 'and'
+            add 7, 4, 6
+
+            // The following lines isolate the last bit (which represents the last carry) and save it in register 7.
+            movi 2, 0x8000                                      // Mask
+            nand 4, 3, 2                                        // Isolation of the MSB
+            nand 4, 4, 4                                        // Reverse to obtain the result of a 'and'
+            nand 6, 5, 2                                        // Isolation of the MSB
+            nand 6, 6, 6                                        // Reverse to obtain the result of a 'and'
+            nand 7, 7, 2                                        // Get the MSB of A+B
+            nand 7, 7, 7                                        // Reverse
+
+            // Addition of the LSB of register 1 and register 2
+            add 3, 3, 5
+
+            // Now we have :
+            //    REG1 : Memory start
+            //    REG2 : Mask 0x8000
+            //    REG3 : LSB of val1 (16)
+            //    REG4 : 16th bit of val1 (1)
+            //    REG5 : LSB of val2 (16)
+            //    REG6 : 16th bit of val2 (1)
+            //    REG7 : 16th bit of REG4 + Reg6 (1)
+
+
+            // The following part is the 'conditional' part for the carry computation.
+            // Typically, the program gets the result of REG4 + REG6 + REG7 (the answer is on 2 bits).
+            // Thereafter, the program isolates the second bit of the aforementioned addition which
+            // represents the carry. Finally, the carry is added to the content of the register 4 (the msb part).
+test_one:   beq 4, 2, one_rone
+            movi 4, 0x0000
+            movi 5, 0x0024 // Addr: test_two
+            jalr 5, 5
+
+one_rone:   movi 4, 0x0001
+
+test_two:   beq 6, 2, one_two
+            movi 5, 0x0029 // Addr: test_sum
+            jalr 5, 5
+
+one_two:    addi 4, 4, 0x0001                                   // Incrementation of the MSB part
+
+test_sum:   beq 7, 2, one_sum
+            movi 5, 0x002e // Addr: sec_part
+            jalr 5, 5
+
+one_sum:    addi 4, 4, 0x0001                                   // Incrementation of the MSB part
+
+sec_part:   movi 2, 0x0002                                      // Mask used to see if the second bit is set to 1
+            nand 4, 4, 2                                        // Apply the mask
+            nand 6, 4, 4                                        // Reverse to obtain the result of a 'and'
+
+            lw 4, 1, 0x0001                                     // Load the MSB of the operand 1
+            lw 5, 1, 0x0002                                     // Load the MSB of the operand 2
+            add 4, 4, 5
+
+            beq 2, 6, car_addr                                  // If the second bit of the "carry" sum is 1 : increment
+            movi 5, 0x003a // Addr: msb_part                              // Otherwise : jump to the end
+            jalr 5, 5
+
+car_addr:   addi 4, 4, 0x0001                                   // Increment the result
+
+msb_part:   halt
