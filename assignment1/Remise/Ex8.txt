@@ -52,19 +52,19 @@
             // represents the carry. Finally, the carry is added to the content of the register 4 (the msb part).
 test_one:   beq 4, 2, one_rone
             movi 4, 0x0000
-            movi 5, <? test_two ?>
+            movi 5, 0x0024 // Addr: test_two
             jalr 5, 5
 
 one_rone:   movi 4, 0x0001
 
 test_two:   beq 6, 2, one_two
-            movi 5, <? test_sum ?>
+            movi 5, 0x0029 // Addr: test_sum
             jalr 5, 5
 
 one_two:    addi 4, 4, 0x0001                                   // Incrementation of the MSB part
 
 test_sum:   beq 7, 2, one_sum
-            movi 5, <? sec_part ?>
+            movi 5, 0x002e // Addr: sec_part
             jalr 5, 5
 
 one_sum:    addi 4, 4, 0x0001                                   // Incrementation of the MSB part
@@ -78,7 +78,7 @@ sec_part:   movi 2, 0x0002                                      // Mask used to 
             add 4, 4, 5
 
             beq 2, 6, car_addr                                  // If the second bit of the "carry" sum is 1 : increment
-            movi 5, <? msb_part ?>                              // Otherwise : jump to the end
+            movi 5, 0x003a // Addr: msb_part                              // Otherwise : jump to the end
             jalr 5, 5
 
 car_addr:   addi 4, 4, 0x0001                                   // Increment the result
