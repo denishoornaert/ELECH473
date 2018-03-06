@@ -8,9 +8,10 @@
 // Important : Even though the program could have been designed so that it records the intermediate additions up to x2^15,
 // it has been decided after empirical analysis to not record further than x1024 as the the tests in the "preloop" tends to
 // introduce overhead in small multiplications.
+
 // Memory organisation:
 // +-----------+-----------------------------------------+
-// | addr      | content                                 |
+// | addresses | content                                 |
 // +-----------+-----------------------------------------+
 // | 0x01  [1] | operand 1                               |
 // | 0x02  [2] | operand 2                               |
@@ -40,7 +41,7 @@
 
 // PART 1 :
 //  Test whether at least one operand is equal to 0.
-//  If yes, we know for sure that the result is then 0. Otherwise, the program resumes.
+//  If yes, we know for sure that the result is then 0. Otherwise, the program resumes in PART 2.
 
             movi 7, 0x0000
             beq 1, 7, zerodetected
@@ -68,7 +69,7 @@ endcond:    movi 5, 0x0011                                        // Upper memor
             // Calculate mask
             movi 4, 0xfffe                                        // Init mask
             movi 3, 0x0000                                        // Null value to reset memory
-comp_loop:  addi 5, 5, -1                                         // Decrement to have next memory address
+comp_loop:  addi 5, 5, -1                                         // Decrementation in order to obtain the next memory address
 
             sw 4, 5, 0x0000                                       // Save mask in memory
             sw 3, 5, 0x000a                                       // Reset memory (LSB)
