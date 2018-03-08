@@ -1,22 +1,34 @@
-			// Test:
-			// 0 <= 0 -> True
-			// -1 <= 0 -> True
-			// 0 <= -1 -> False
-			// -1 <= 1 -> True
-			// 1 <= -1 -> False
-			// -64 <= 63 -> True
-			// 63 <= -64 -> False
-			// -64 <= -1 -> True
-			// -1 <= -64 -> False
-			// -1 <= -1 -> True
-			// 63 <= 63 -> True
-			
+// Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
+// Given the integers representation (complement of 2), the test vectors components have been
+// chosen so that they prove the comparison (lower or equal) right for the complement of 2
+// representation particularities. By particularities, we mean both the fact that there are
+// more negative number than positive (if the 0 is not considered) and the fact that negative
+// numbers have a bigger binary representation. Therefore, the tests generally use either :
+// 	1. -64	(as it is the lowest possible value and has no positive counter part),
+//	2. -1	(as it has the biggest binary representation),
+//	3. 0
+//	4. 1	(as it has the lowest binary representation if 0 is not considered)
+//	5. 63 	(as it is the biggest positive value)
+//
+// Consequently, the test vectors are the following :
+// 0 	<= 0 	-> True
+// -1 	<= 0 	-> True
+// 0 	<= -1 	-> False
+// -1 	<= 1 	-> True
+// 1 	<= -1 	-> False
+// -64 	<= 63 	-> True
+// 63 	<= -64 	-> False
+// -64 	<= -1 	-> True
+// -1 	<= -64 	-> False
+// -1 	<= -1 	-> True
+// 63 	<= 63 	-> True
+
 			// Reg1 = operand 1
 			// Reg2 = operand 2
 			// Reg3 = result
 			// Reg4 = jump addres
 			// Reg7 = memory address
-		  
+
 			MOVI 7, 0x0000
 
 			// --------------- TEST 1 ---------------
@@ -27,28 +39,25 @@
 			MOVI 3, 0x0000
 			MOVI 4, 0x000b // <? endTestOne ?>
 			JALR 4, 4
-		
+
 			// Error
 blTestOne:  MOVI 3, 0x0001
 
 			// Save result
 endTestOne:	SW 3, 7, 0x0000
-			
-			
+
+
 			// --------------- TEST 2 ---------------
-			// 
+			//
 			MOVI 1, 0x0001
 			MOVI 2, 0xffff
 			BL 1, 2, blTestOne // <
 			MOVI 3, 0x0000
 			MOVI 4, 0x000b // <? endTestOne ?>
 			JALR 4, 4
-		
+
 			// Error
 blTestOne:  MOVI 3, 0x0001
 
 			// Save result
 endTestOne:	SW 3, 7, 0x0000
-			
-			
-			
