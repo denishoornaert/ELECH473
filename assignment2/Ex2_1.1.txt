@@ -1,89 +1,93 @@
-                    // Make: <=
+                    // Make: <= TODO comment useful ???
                     MOVI 1, 0x0000
                     MOVI 2, 0x0001
-                    
-                    // Test if 1 == 2
+
+                    // Test whether operand 1 is equal to operand 2. If yes, then true. Otherwise, resume.
                     BEQ 1, 2, isLowerOrEqual
-                    
-                    // Test for -64 (don't exist 64)
+
+                    // Test whether operand 1 or operand 2 is equal to -64 (as 64 is not 'representable')
+                    // If yes, then true as nothing can be bigger than -64. Otherwise, resume.
                     MOVI 3, -64
                     BEQ 1, 3, isLowerOrEqual
                     BEQ 2, 3, isBigger
-                    
-                    MOVI 3, 0x7fff
-                    MOVI 4, 0x8000
-                    
-                    NAND 5, 4, 1                            // Get MSB 1 bit of op 1
-                    NAND 6, 4, 2                            // Get MSB 1 bit of op 2
-                    
+
+                    // Set up of two masks used just after for isolating the MSB of the two operands.
+                    MOVI 3, 0x7fff                          // Mask 011...11
+                    MOVI 4, 0x8000                          // Mask 100...00
+                    NAND 5, 4, 1                            // Get MSB of operand 1
+                    NAND 6, 4, 2                            // Get MSB of operand 2
+
+                    // Test whether the MSB of operand 1 is equal to 1.
+                    // If yes, resume in 'oneNegative'. Otherwise, test whether the MSB of operand 1 is equal to 1.
+                    // If the second test is true, resume in 'twoNegative'. Otherwise, resume and it means that both
+                    // operand 1 and operand 2 are positive.
                     BEQ 5, 3, oneNegative
                     // First not negative
                     BEQ 6, 3, twoNegative
                     // Second not negative
-                    
-                    // 1 & 2 positive !
-                    // Thus reverse 2 (complement of 2)
+
+                    // Since we know that both operands are positive, we determine the opposite of operand 2 by
+                    // reversing the complement of 2 conversion method. Then we subtract operand 1 operand 2 before
+                    // checking the sign of the obtained difference in 'testLowerOrNot'.
                     ADDI 2, 2, -1                           // reg2 = reg2 - 1
                     NAND 2, 2, 2                            // Not 2
-                    
+
                     ADD 5, 1, 2
                     MOVI 7, <? testLowerOrNot ?>
                     JALR 7, 7
 
-                    
+
 oneNegative:        BEQ 3, 5, oneAndTwoNegative
                     // First negative, second positive
-                    
+
                     ADD 5, 2, 1
                     MOVI 7, <? testLowerOrNot ?>
                     JALR 7, 7
 
-                    
+
                     // First positive, second negative
 twoNegative:        ADD 5, 1, 2
                     MOVI 7, <? testBiggerOrNot ?>
                     JALR 7, 7
-                    
+
                     // First and second negative
 oneAndTwoNegative:  ADDI 1, 1, -1                           // reg2 = reg2 - 1
                     // 1 & 2 negative !
                     // Thus reverse 1 (complement of 2)
                     NAND 1, 1, 1                            // Not 2
-                    
+
                     ADD 5, 1, 2
                     MOVI 7, <? testBiggerOrNot ?>
                     JALR 7, 7
 
 
 testLowerOrNot:     NAND 5, 4, 5                            // Get MSB 1 bit of difference
-                    
+
                     BEQ 3, 5, diffNegativeLower
                     // Difference positive
                     MOVI 7, <? isBigger ?>
                     JALR 7, 7
-                    
+
                     // Difference negative
 diffNegativeLower:  MOVI 7, <? isLowerOrEqual ?>
                     JALR 7, 7
 
 testBiggerOrNot:    NAND 5, 4, 5                            // Get MSB 1 bit of difference
-                    
+
                     BEQ 3, 5, diffNegativeBigger
                     // Difference positive
                     MOVI 7, <? isLowerOrEqual ?>
                     JALR 7, 7
-                    
+
                     // Difference negative
 diffNegativeBigger: MOVI 7, <? isBigger ?>
                     JALR 7, 7
 
 
 
-isBigger:           MOVI 1, 0xdddd
+isBigger:           MOVI 1, 0xdddd // means that operand 2 is lower than operand 1 (value arbitrarily set)
                     MOVI 7, <? end ?>
                     JALR 7, 7
-                    
-isLowerOrEqual:     MOVI 1, 0xffff
+
+isLowerOrEqual:     MOVI 1, 0xffff // means that operand 1 is lower than operand 2 (value arbitrarily set)
 end:                halt
-                    
-                    
