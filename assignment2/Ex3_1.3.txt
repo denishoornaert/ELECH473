@@ -62,7 +62,7 @@ endcond:    nop
             jalr 2, 2
 
 preloop:    addi 7, 7, -1                                         // Decrement of the counter
-
+            
             // Here we have:
             // 1: memory start address
             // 2: mask
@@ -78,7 +78,7 @@ preloop:    addi 7, 7, -1                                         // Decrement o
             lw 3, 1, 0x0001                                      // LSB for operand 1 x1
             movi 4, 0x0000                                       // MSB for operand 1 x1
 
-testBig:    beq 1, 2 loop
+testBig:    beq 1, 2, loop
             bg 7, 6, bigger
             addi 2, 2, -1
             shifti 6, 6, -1
