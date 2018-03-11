@@ -1,8 +1,24 @@
+//         
+//             movi 1, 0xf000     // LSB
+//             movi 2, 0xf000     // MSB
+//             
+//             movi 3, 0x0001     // Number of shift
+//             
+//             shl 2, 2, 3
+//             shl 1, 1, 3, carry
+//             movi 7, <? aftercarry ?>
+//             jalr 7, 7
+//             
+// carry:      addi 2, 2, 0x0001
+// aftercarry: halt
+
+
+
         
-            movi 1, 0xf000     // LSB
+            movi 1, 0xf0f0     // LSB
             movi 2, 0xf000     // MSB
             
-            movi 3, 0x0001     // Number of shift
+            movi 3, 0x0003     // Number of shift
             
             shl 2, 2, 3
             shl 1, 1, 3, carry
