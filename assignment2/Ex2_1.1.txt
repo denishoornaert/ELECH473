@@ -37,10 +37,9 @@
                     MOVI 7, <? isNegative ?>
                     JALR 7, 7
 
-// TODO explain how beq could be different in line 40 and line 24 ... or maybe 6 and 3 should be compared instead ?
 // As register one is known to be negative and register 2 is known to be positive, they are simply added to form the difference.
 // The sign of the result is then checked in 'isNegative'.
-oneNegative:        BEQ 3, 5, oneAndTwoNegative
+oneNegative:        BEQ 3, 6, oneAndTwoNegative
                     // First negative, second positive
 
                     ADD 5, 2, 1
@@ -65,24 +64,16 @@ oneAndTwoNegative:  ADDI 1, 1, -1                           // reg2 = reg2 - 1
 
 isNegative:         NAND 5, 4, 5                            // Get MSB 1 bit of difference
 
-                    BEQ 3, 5, diffNegativeLower             // TODO jump directly to 'isLowerOrEqual' ?
+                    BEQ 3, 5, isLowerOrEqual
                     // Difference positive
                     MOVI 7, <? isBigger ?>
                     JALR 7, 7
 
-                    // Difference negative
-diffNegativeLower:  MOVI 7, <? isLowerOrEqual ?>            // TODO useful ?
-                    JALR 7, 7
-
 isPositive:         NAND 5, 4, 5                            // Get MSB 1 bit of difference
 
-                    BEQ 3, 5, diffNegativeBigger            // TODO jump directly to 'isBigger' ?
+                    BEQ 3, 5, isBigger
                     // Difference positive
                     MOVI 7, <? isLowerOrEqual ?>
-                    JALR 7, 7
-
-                    // Difference negative
-diffNegativeBigger: MOVI 7, <? isBigger ?>                  // TODO useful ?
                     JALR 7, 7
 
 
