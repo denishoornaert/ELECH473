@@ -1,20 +1,19 @@
-					// Make: <=
-					
+// Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
+// Objective : implementing the operator '<=' using only the IS[1] instructions.
+
 					MOVI 1, 0x0000
 					MOVI 2, 0x0001
-					
+
 					// Test if reg1 == reg2
 					BEQ 1, 2, isLowerOrEqual
-					
+
 					// reg1 <= reg2
 					BL 1, 2, isLowerOrEqual
-					
-					
+
+
 isBigger:           MOVI 1, 0xdddd
 					MOVI 7, <? end ?>
 					JALR 7, 7
-					
+
 isLowerOrEqual:     MOVI 1, 0xffff
 end:                halt
-					
-					

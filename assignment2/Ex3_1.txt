@@ -1,4 +1,6 @@
-// Objective: reg4(MSB) reg3(LSB) = reg1 * reg2
+// Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
+// Objective : implementing the operator '*' for two 32 bits integers using the IS[2] instructions.
+// In other words, reg4(MSB) reg3(LSB) = reg1 * reg2
 
 // Memory INFO:
 // 0x01  [1]: operand 1
@@ -40,7 +42,7 @@
 zerodetected: movi 3, 0x0000                                      // Result LSB
             movi 4, 0x0000                                        // Result MSB
             halt                                                  // If : halt
-			
+
             // Init
 endcond:    movi 5, 0x0011                                        // Upper memory address
             movi 6, 0x0007                                        // Lower memory address
@@ -178,9 +180,9 @@ end:        lw 3, 1, 0x0003                                     // Load result
             //      result    = result    + operand 1 (or x2, x4, x9, ..., x1024)
 
 addOp:      lw 5, 1, 0x0003                                     // Load LSB result in reg 5
-			
+
             sw 4, 1, 0x0006                                     // Save MSB of operand 1
-			
+
 			add 3, 3, 5, carr_inc
 			movi 2, 0x0000
 			movi 1, <? aft_carr ?>                              // aft_carr addr

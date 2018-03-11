@@ -1,5 +1,6 @@
 // Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
-// Objective : implementing thye operator '<=' using only the 8 basic instructions.
+// Objective : implementing the operator '<=' using only the 8 basic instructions.
+
                     MOVI 1, 0x0000
                     MOVI 2, 0x0001
 
@@ -30,7 +31,7 @@
 
 // -------------- op1 and op2 are positive --------------
 
-// Since we know that both operands are positive, we determine the opposite of operand 2 by
+// Since we know that both operands are positives, we determine the opposite of operand 2 by
 // reversing the complement of 2 conversion method. Then we subtract operand 1 operand 2 before
 // checking the sign of the obtained difference in 'isNegative'.
                     ADDI 2, 2, -1                           // reg2 = reg2 - 1
@@ -46,7 +47,7 @@
 
 
 // We know that op1 is negative, we test if op2 is also negative and jump to 'oneAndTwoNegative' if it's true. Otherwise,
-// we know that op1 is negative and op2 is positive, thus op1 < op2.
+// we know that op1 is negative and op2 is positive. Thus op1 < op2.
 oneNegative:        BEQ 3, 6, oneAndTwoNegative
                     // First negative, second positive
 
@@ -55,7 +56,7 @@ oneNegative:        BEQ 3, 6, oneAndTwoNegative
                     JALR 7, 7
 
 
-// AS both register 1 and 2 are known to be negative, register 1 is replaced by its positive counterpart so that a meaningful
+// As both register 1 and 2 are known to be negative, register 1 is replaced by its positive counterpart so that a meaningful
 // difference of the two registers can be operated. Then we check the sign of the result.
 oneAndTwoNegative:  ADDI 1, 1, -1                           // reg1 = reg1 - 1
                     NAND 1, 1, 1                            // Not 1
