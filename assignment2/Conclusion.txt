@@ -1,7 +1,7 @@
 The conclusion drawn by the group is that despite the fact that 8 well selected
 instructions are enough to implement any decidable algorithm, the amount of time
-and efforts required by programmers to program simple arithmetic operator such
-as a multiplier is both extremely important and error(s) prone.
+and efforts required by programmers to program even simple arithmetic operator
+such as a multiplier is both extremely important and error(s) prone.
 
 One can easily observe by comparing the exercise 9 of the lab 1, the exercise
 3.1 of this lab and the exercise 3.2 of this lab that : the bigger the
@@ -9,4 +9,4 @@ instructions set is, the smaller the code becomes. Making it both more readable
 and more maintainable as the verification process is delegated to the hardware
 designers. In addition, as the multiplication operator in IS[2] takes the same
 amount of cycles per instruction than the others, no overhead is introduce and
-therefore, no trade-off has to be found.
+therefore, no trade-off between readability and performance has to be found.
