@@ -1,4 +1,4 @@
-// Authors : Denis Hoornaert, Nathan Liccardo and Remy Detobel
+// Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
 // Objective: reg1 * reg2 = reg4(MSB) reg3(LSB)
 
 // Memory organisation:
@@ -22,7 +22,9 @@
             // nop
             // nop
 
-
+// PART 1 :
+//  Test whether at least one operand is equal to 0.
+//  If yes, we know for sure that the result is then 0. Otherwise, the program resumes.
             movi 3, 0x0000                                        // Null value
             beq 1, 3, zerodetected
             beq 2, 3, zerodetected
@@ -33,14 +35,19 @@
 zerodetected: movi 4, 0x0000                                      // Result MSB
             halt                                                  // If : halt
 
-            // Test if op1 < op2
+// PART 2 :
+//  Test whether operand 1 is lower than operand 2. If yes, resume in init (do nothing).
+//  Otherwise, swap the registers content so that the counter containing the lowest value
+//  is used as the counter. The expected result is to mitigate the number of loop entering.
 endcond:    bl 2, 1, init                                         // If op2 < op1 -> jump to init
             // Else: inverse reg1 and reg2
             add 7, 1, 3                                           // Save reg1 in reg7
             add 1, 2, 3                                           // reg2 in reg1
             add 2, 7, 3                                           // save of reg1 in reg2
 
-            // Init
+// PART 3 :
+//  Simple initialization of register 5 and 6. Thereafter, the context of the loop is saved
+//  before jumping to the loop part (preloop is skipped on purpose has no precomputation can be loaded).
 init:       movi 5, 0x0000                                        // Result LSB
             movi 6, 0x0000                                        // Result MSB
             add 7, 3, 2                                           // Counter = op2 (& reg3 = 0)
@@ -57,7 +64,7 @@ init:       movi 5, 0x0000                                        // Result LSB
 
 preloop:    addi 5, 1, 1                                          // movi 5, 0x0001 in ONE instruction
             sub 7, 7, 5                                           // Decrement of the counter
-            
+
             beq 7, 1, end
             movi 5, <? loop ?>
             jalr 5, 5
@@ -118,7 +125,7 @@ addOp:      lw 5, 1, 0x0003                                       // Load LSB re
             add 3, 3, 5, carr_inc
             movi 5, <? aft_ex ?>                                  // aft_ex addr
             jalr 5, 5
-            
+
 carr_inc:   addi 4, 4, 0x0001
 
 aft_ex:     sw 3, 1, 0x0003                                       // Save result (LSB)
