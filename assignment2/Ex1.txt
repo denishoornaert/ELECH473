@@ -22,6 +22,8 @@
 // -1 	<= -64 	-> False
 // -1 	<= -1 	-> True
 // 63 	<= 63 	-> True
+// Some comparisons might seem a bit useless or overkill but : better safe than sorry.
+// For the following code, simply uncomment the test you desired to try and comment the previous one.
 
 			// Reg1 = operand 1
 			// Reg2 = operand 2
@@ -32,25 +34,51 @@
 			MOVI 7, 0x0000
 
 			// --------------- TEST 1 ---------------
-			// 0 < 0 -> False
+			// 0 <= 0 -> True
 			MOVI 1, 0x0000
 			MOVI 2, 0x0000
-			BL 1, 2, blTestOne // <
-			MOVI 3, 0x0000
-			MOVI 4, 0x000b // <? endTestOne ?>
-			JALR 4, 4
-
-			// Error
-blTestOne:  MOVI 3, 0x0001
-
-			// Save result
-endTestOne:	SW 3, 7, 0x0000
-
-
 			// --------------- TEST 2 ---------------
-			//
-			MOVI 1, 0x0001
-			MOVI 2, 0xffff
+			// -1 <= 0 -> True
+			// MOVI 1, -1
+			// MOVI 2, 0x0000
+			// --------------- TEST 3 ---------------
+			// 0 <= -1 -> True
+			// MOVI 1, 0x0000
+			// MOVI 2, -1
+			// --------------- TEST 4 ---------------
+			// -1 <= 1 -> True
+			// MOVI 1, -1
+			// MOVI 2, 0x0001
+			// --------------- TEST 5 ---------------
+			// 1 <= -1 -> True
+			// MOVI 1, 0x0001
+			// MOVI 2, -1
+			// --------------- TEST 6 ---------------
+			// -64 <= 63 -> True
+			// MOVI 1, -64
+			// MOVI 2, 0x003f
+			// --------------- TEST 7 ---------------
+			// 63 <= -64 -> True
+			// MOVI 1, 0x003f
+			// MOVI 2, -64
+			// --------------- TEST 8 ---------------
+			// -64 <= -1 -> True
+			// MOVI 1, -64
+			// MOVI 2, -1
+			// --------------- TEST 9 ---------------
+			// -1 <= -64 -> True
+			// MOVI 1, -1
+			// MOVI 2, -64
+			// --------------- TEST 10 --------------
+			// -1 <= -1 -> True
+			// MOVI 1, -1
+			// MOVI 2, -1
+			// --------------- TEST 11 --------------
+			// 63 <= 63 -> True
+			// MOVI 1, 0x003f
+			// MOVI 2, 0x003f
+
+
 			BL 1, 2, blTestOne // <
 			MOVI 3, 0x0000
 			MOVI 4, 0x000b // <? endTestOne ?>
