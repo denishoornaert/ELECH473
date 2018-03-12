@@ -82,7 +82,7 @@ loop:       movi 2, 0x000a                                        // Counter num
             lw 3, 1, 0x0001                                       // LSB for operand 1 x1
             movi 4, 0x0000                                        // MSB for operand 1 x1
 
-testBig:    beq 1, 2, addOp
+testBig:    beq 1, 2, sumOp
             bg 7, 6, bigger
             addi 5, 1, 1                                          // movi 5, 0x0001 in ONE instruction :)
             sub 2, 2, 5
@@ -90,28 +90,39 @@ testBig:    beq 1, 2, addOp
             movi 5, <? testBig ?>
             jalr 5, 5
 
-// TODO use sub 7, 6 without movi
+
+            // reg2 = nbr of shift
+            // reg3 = LSB
+            // reg4 = MSB
+            // reg6 = max number < of the shift
+            // reg7 = counter
+
+            // reg5 = -nbr shift
+
 bigger:     sub 7, 7, 6
-            movi 6, 0x0001
 
-// TODO: shift avec des masque
-nextShl:    beq 2, 1, addOp                                       // If we made all shift
-            sub 2, 2, 6
-            shl 4, 4, 6
-            shl 3, 3, 6, shiftCarry
-            movi 5, <? nextShl ?>
-            jalr 5, 5
+            movi 1, 0x0000
+            sub 5, 1, 2                                           // reg2 = -reg2
+            nand 6, 1, 1                                          // reg6 = 0xffff
+            shl 6, 6, 5                                           // reg6 = reg6 >> reg5 (-nbr shift)
+            nand 6, 6, 6                                          // not reg6
 
-shiftCarry: addi 4, 4, 0x0001
-            movi 5, <? nextShl ?>
-            jalr 5, 5
+            nand 6, 3, 6                                          // Get MSB part of reg3 (LSB)
+            nand 6, 6, 6                                          // Not reg6
+            movi 1, -16
+            add 1, 1, 2                                           // reg1 = -16 + nbr shift
+            shl 6, 6, 1                                           // shift reg6 to right
 
+            shl 3, 3, 2                                           // Shift LSB
+            shl 4, 4, 2                                           // Shift MSB
+            add 4, 4, 6                                           // Add "carry"
+            movi 1, 0x0000
 
 // ----------------------------------------------------------------
             //      reg4 reg3 = reg4 reg3 + reg6 reg5
             //      result    = operand 1 (or x2, x4, x9, ..., x1024) + result
 
-addOp:      lw 5, 1, 0x0003                                       // Load LSB result in reg 5
+sumOp:      lw 5, 1, 0x0003                                       // Load LSB result in reg 5
             lw 6, 1, 0x0004                                       // Load MSB of operand 2
 
             add 4, 4, 6
