@@ -11,7 +11,7 @@
 
 // Memory organisation:
 // +-----------+-----------------------------------------+
-// | addr      | content                                 |
+// | addresses | content                                 |
 // +-----------+-----------------------------------------+
 // | 0x01  [1] | operand 1                               |
 // | 0x02  [2] | operand 2                               |
@@ -41,7 +41,7 @@
 
 // PART 1 :
 //  Test whether at least one operand is equal to 0.
-//  If yes, we know for sure that the result is then 0. Otherwise, the program resumes.
+//  If yes, we know for sure that the result is then 0. Otherwise, the program resumes in PART 2.
 
             movi 7, 0x0000
             beq 1, 7, zerodetected
@@ -69,7 +69,7 @@ endcond:    movi 5, 0x0011                                        // Upper memor
             // Calculate mask
             movi 4, 0xfffe                                        // Init mask
             movi 3, 0x0000                                        // Null value to reset memory
-comp_loop:  addi 5, 5, -1                                         // Decrement to have next memory address
+comp_loop:  addi 5, 5, -1                                         // Decrementation in order to obtain the next memory address
 
             sw 4, 5, 0x0000                                       // Save mask in memory
             sw 3, 5, 0x000a                                       // Reset memory (LSB)
@@ -83,7 +83,7 @@ comp_loop:  addi 5, 5, -1                                         // Decrement t
             nand 4, 7, 7                                          // reg4 = not (reg7)
 
             beq 6, 5, comp_end                                    // If we have finish to compute all masks
-            movi 7, <? comp_loop ?>                               // Else jump to the next mask
+            movi 7, 0x0018 // Addr: comp_loop                               // Else jump to the next mask
             jalr 7, 7
 
 // PART 3 :
@@ -106,7 +106,7 @@ comp_end:   movi 5, 0x0000                                        // Result LSB
             add 3, 3, 1                                           // Move op1 in reg3
 
             movi 1, 0x0000
-            movi 2, <? loop ?>
+            movi 2, 0x0058 // Addr: loop
             jalr 2, 2
 
 // PART 4 :
@@ -164,7 +164,7 @@ leqx:       movi 2, 0x0011                                       // 'Mask memory
             add 7, 7, 2
 
             movi 1, 0x0000
-            movi 2, <? loop ?>
+            movi 2, 0x0058 // Addr: loop
             jalr 2, 2
 
             // Load operand for ex 8
@@ -235,19 +235,19 @@ addOp:      lw 5, 1, 0x0003                                     // Load LSB resu
             // represents the carry. Finally, the carry is added to the content of the register 4 (the msb part).
 test_one:   beq 4, 2, one_rone
             movi 4, 0x0000                                      // Else
-            movi 5, <? test_two ?>                              // test_two addr
+            movi 5, 0x0079 // Addr: test_two                              // test_two addr
             jalr 5, 5
 
 one_rone:   movi 4, 0x0001                                      // If
 
 test_two:   beq 6, 2, one_two
-            movi 5, <? test_sum ?>                              // test_sum addr
+            movi 5, 0x007e // Addr: test_sum                              // test_sum addr
             jalr 5, 5
 
 one_two:    addi 4, 4, 0x0001                                   // Incrementation of the MSB part
 
 test_sum:   beq 7, 2, one_sum
-            movi 5, <? sec_part ?>                              // sec_part addr
+            movi 5, 0x0083 // Addr: sec_part                              // sec_part addr
             jalr 5, 5
 
 one_sum:    addi 4, 4, 0x0001                                   // Incrementation of the MSB part
@@ -262,7 +262,7 @@ sec_part:   movi 2, 0x0002                                      // Mask used to 
             add 4, 4, 5
 
             beq 2, 6, carr_inc                                  // If the second bit of the "carry" sum is 1 : increment
-            movi 5, <? aft_ex ?>                                // Otherwise : jump to the end
+            movi 5, 0x008f // Addr: aft_ex                                // Otherwise : jump to the end
             jalr 5, 5
 
 carr_inc:   addi 4, 4, 0x0001                                   // Incrementation of the result
@@ -295,7 +295,7 @@ savexloop:  addi 1, 1, -1
             addi 5, 5, 1                                        // Complement of 2
             add 5, 6, 5
             beq 5, 7, savex
-            movi 5, <? savexloop ?>                             // else
+            movi 5, 0x0097 // Addr: savexloop                             // else
             jalr 5, 5
 
             // Bigger than X
