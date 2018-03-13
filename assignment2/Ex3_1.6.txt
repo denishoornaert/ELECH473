@@ -97,11 +97,9 @@ testBig:    beq 1, 2, addOp
             movi 5, <? testBig ?>
             jalr 5, 5
 
-// TODO use sub 7, 6 without movi
 bigger:     sub 7, 7, 6
             movi 6, 0x0001
 
-// TODO: shift avec des masque
 nextShl:    beq 2, 1, addOp                                       // If we made all shift
             sub 2, 2, 6
             shl 4, 4, 6
