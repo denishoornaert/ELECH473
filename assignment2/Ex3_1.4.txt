@@ -27,18 +27,27 @@
             beq 1, 7, zerodetected
             beq 2, 7, zerodetected
 
-            movi 3, <? endcond ?>                                 // Else : resume
+            movi 3, <? endzerocond ?>                             // Else : resume
             jalr 3, 3
 
 zerodetected: movi 3, 0x0000                                      // Result LSB
             movi 4, 0x0000                                        // Result MSB
             halt                                                  // If : halt
 
-            // TODO: reverse if op1 < op2
-endcond:    nop
+
+            // reverse if op1 < op2
+endzerocond: bl 1, 2, reverseOp
+
+            movi 3, <? endcond ?>
+            jalr 3, 3
+
+reverseOp:  add 3, 7, 1                                           // Save reg1 in reg7
+            add 1, 7, 2                                           // Move reg2 in reg1
+            add 2, 7, 3                                           // Move reg3 (save of 1) in reg2
+
 
             // Init
-            movi 5, 0x0011                                        // Upper memory address
+endcond:    movi 5, 0x0011                                        // Upper memory address
             movi 6, 0x0007                                        // Lower memory address
 
 
@@ -75,15 +84,15 @@ preloop:    addi 5, 1, 1                                          // movi 5, 0x0
             // 6: use for comparison
             // 7: counter
 
-            movi 2, 0x000a                                        // Counter number of shift
-            movi 6, 0x03ff                                        // Test bigger
+            movi 2, 0x000a                                       // Counter number of shift
+            movi 6, 0x03ff                                       // Test bigger
 
-            lw 3, 1, 0x0001                                       // LSB for operand 1 x1
-            movi 4, 0x0000                                        // MSB for operand 1 x1
+            lw 3, 1, 0x0001                                      // LSB for operand 1 x1
+            movi 4, 0x0000                                       // MSB for operand 1 x1
 
 testBig:    beq 1, 2, loop
             bg 7, 6, bigger
-            addi 5, 1, 1                                          // movi 5, 0x0001 in ONE instruction :)
+            addi 5, 1, 1                                         // movi 5, 0x0001 in ONE instruction :)
             sub 2, 2, 5
             shifti 6, 6, -1
             movi 5, <? testBig ?>
@@ -93,7 +102,7 @@ bigger:     movi 6, 0x0001
             shl 5, 6, 2
             sub 7, 7, 5
             addi 7, 7, 1
-nextShl:    beq 2, 1, loop                                        // If we made all shift
+nextShl:    beq 2, 1, loop                                       // If we made all shift
             sub 2, 2, 6
             shl 4, 4, 6
             shl 3, 3, 6, shiftCarry
@@ -105,13 +114,13 @@ shiftCarry: addi 4, 4, 0x0001
             jalr 5, 5
 
 
-loop:       beq 1, 7, end                                         // Check end of loop or not
+loop:       beq 1, 7, end                                       // Check end of loop or not
             movi 2, <? addOp ?>
             jalr 2, 2
 
-end:        lw 3, 1, 0x0003                                       // Load result
+end:        lw 3, 1, 0x0003                                     // Load result
             lw 4, 1, 0x0004
-            halt                                                  // Halt program
+            halt                                                // Halt program
 
 
 // Begining EX8 ----------------------------------------------------------------
@@ -119,18 +128,18 @@ end:        lw 3, 1, 0x0003                                       // Load result
             //      reg4 reg3 = reg4 reg3 + reg6 reg5
             //      result    = operand 1 (or x2, x4, x9, ..., x1024) + result
 
-addOp:      lw 5, 1, 0x0003                                       // Load LSB result in reg 5
-            lw 6, 1, 0x0004                                       // Load MSB of operand 2
+addOp:      lw 5, 1, 0x0003                                     // Load LSB result in reg 5
+            lw 6, 1, 0x0004                                     // Load MSB of operand 2
 
             add 4, 4, 6
             add 3, 3, 5, carr_inc
-            movi 5, <? aft_ex ?>                                  // aft_ex addr
+            movi 5, <? aft_ex ?>                                // aft_ex addr
             jalr 5, 5
             
 carr_inc:   addi 4, 4, 0x0001
 
-aft_ex:     sw 3, 1, 0x0003                                       // Save result (LSB)
-            sw 4, 1, 0x0004                                       // Save result (MSB)
+aft_ex:     sw 3, 1, 0x0003                                     // Save result (LSB)
+            sw 4, 1, 0x0004                                     // Save result (MSB)
 
-            movi 6, <? preloop ?>                                 // preloop flag addr
+            movi 6, <? preloop ?>                               // preloop flag addr
             jalr 6, 6

@@ -1,4 +1,4 @@
-// Authors : Denis Hoornaert, Nathan Liccardo and Remy Detobel
+// Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
 // Objective: reg1 * reg2 = reg4(MSB) reg3(LSB)
 
 // Memory organisation:
@@ -22,37 +22,33 @@
             // nop
             // nop
 
+// PART 1 :
+//  Test whether at least one operand is equal to 0.
+//  If yes, we know for sure that the result is then 0. Otherwise, the program resumes.
+            movi 3, 0x0000                                        // Null value
+            beq 1, 3, zerodetected
+            beq 2, 3, zerodetected
 
-            movi 7, 0x0000
-            beq 1, 7, zerodetected
-            beq 2, 7, zerodetected
+            movi 7, <? endcond ?>                                 // Else : resume
+            jalr 7, 7
 
-            movi 3, <? endzerocond ?>                             // Else : resume
-            jalr 3, 3
-
-zerodetected: movi 3, 0x0000                                      // Result LSB
-            movi 4, 0x0000                                        // Result MSB
+zerodetected: movi 4, 0x0000                                      // Result MSB
             halt                                                  // If : halt
 
+// PART 2 :
+//  Test whether operand 1 is lower than operand 2. If yes, resume in init (do nothing).
+//  Otherwise, swap the registers content so that the counter containing the lowest value
+//  is used as the counter. The expected result is to mitigate the number of loop entering.
+endcond:    bl 2, 1, init                                         // If op2 < op1 -> jump to init
+            // Else: inverse reg1 and reg2
+            add 7, 1, 3                                           // Save reg1 in reg7
+            add 1, 2, 3                                           // reg2 in reg1
+            add 2, 7, 3                                           // save of reg1 in reg2
 
-            // reverse if op1 < op2
-endzerocond: bl 1, 2, reverseOp
-
-            movi 3, <? endcond ?>
-            jalr 3, 3
-
-reverseOp:  add 3, 7, 1                                           // Save reg1 in reg7
-            add 1, 7, 2                                           // Move reg2 in reg1
-            add 2, 7, 3                                           // Move reg3 (save of 1) in reg2
-
-
-            // Init
-endcond:    movi 5, 0x0011                                        // Upper memory address
-            movi 6, 0x0007                                        // Lower memory address
-
-
-            movi 3, 0x0000                                        // Null value to reset memory
-            movi 5, 0x0000                                        // Result LSB
+// PART 3 :
+//  Simple initialization of register 5 and 6. Thereafter, the context of the loop is saved
+//  before jumping to the loop part (preloop is skipped on purpose has no precomputation can be loaded).
+init:       movi 5, 0x0000                                        // Result LSB
             movi 6, 0x0000                                        // Result MSB
             add 7, 3, 2                                           // Counter = op2 (& reg3 = 0)
 
@@ -62,18 +58,23 @@ endcond:    movi 5, 0x0011                                        // Upper memor
             sw 5, 3, 0x0003                                       // 3.  result LSB
             sw 6, 3, 0x0004                                       // 4.  result MSB
 
-            // Prepare input for ex8
-            movi 4, 0x0000
-            add 3, 3, 1                                           // Move op1 in reg3
-
             movi 1, 0x0000
             movi 2, <? loop ?>
             jalr 2, 2
 
+// PART 4 :
+//
 preloop:    addi 5, 1, 1                                          // movi 5, 0x0001 in ONE instruction
             sub 7, 7, 5                                           // Decrement of the counter
-            
+
             beq 7, 1, end
+            movi 5, <? loop ?>
+            jalr 5, 5
+
+end:        lw 3, 1, 0x0003                                       // Load result
+            lw 4, 1, 0x0004
+            halt                                                  // Halt program
+
 
             // Here we have:
             // 1: memory start address
@@ -84,25 +85,34 @@ preloop:    addi 5, 1, 1                                          // movi 5, 0x0
             // 6: use for comparison
             // 7: counter
 
-            movi 2, 0x000a                                       // Counter number of shift
-            movi 6, 0x03ff                                       // Test bigger
+// PART 5 :
+//  This portion of the code starts with four initialisations and is followed by a loop ('testBig') which performs each time a shift on the mask.
+//  The aim of the loop is to find the first bit set to '1' in the register (from left to right).
+//  The result of the shift is at each loop entering compared to both the counter dedicated to the shifts and the counter dedicated to the
+//  multiplication. In the latter case, we check the equality (the program jumps in the addition is so) while in the former case, the program checks
+//  whether the multiplication counter is bigger than the shifted mask (if yes : the program resumes in 'bigger').
+loop:       movi 2, 0x000a                                        // Counter number of shift
+            movi 6, 0x03ff                                        // Mask to test whether a number is bigger than the counter
 
-            lw 3, 1, 0x0001                                      // LSB for operand 1 x1
-            movi 4, 0x0000                                       // MSB for operand 1 x1
+            lw 3, 1, 0x0001                                       // LSB for operand 1 x1
+            movi 4, 0x0000                                        // MSB for operand 1 x1
 
-testBig:    beq 1, 2, loop
+testBig:    beq 1, 2, addOp
             bg 7, 6, bigger
-            addi 5, 1, 1                                         // movi 5, 0x0001 in ONE instruction :)
+            addi 5, 1, 1                                          // movi 5, 0x0001 in ONE instruction :)
             sub 2, 2, 5
             shifti 6, 6, -1
             movi 5, <? testBig ?>
             jalr 5, 5
 
-bigger:     movi 6, 0x0001
-            shl 5, 6, 2
-            sub 7, 7, 5
-            addi 7, 7, 1
-nextShl:    beq 2, 1, loop                                       // If we made all shift
+//  Subtraction of the highest possible value reachable by shifting
+bigger:     sub 7, 7, 6
+
+// PART 6 :
+//  Simple shift to the left on 32 bits as long as register 2 (size of mask memory) is different than register 1 (mask memory lower bound).
+//  At the end, registers 3 and 4 contain the addresses needed to load the good intermediate results later in the code (in 'addOp').
+            movi 6, 0x0001
+nextShl:    beq 2, 1, addOp                                       // If we made all shift
             sub 2, 2, 6
             shl 4, 4, 6
             shl 3, 3, 6, shiftCarry
@@ -114,32 +124,24 @@ shiftCarry: addi 4, 4, 0x0001
             jalr 5, 5
 
 
-loop:       beq 1, 7, end                                       // Check end of loop or not
-            movi 2, <? addOp ?>
-            jalr 2, 2
+// PART 7 :
+//  Simple addition with carry and then jump back to 'preloop'.
+//  In other words :
+//      reg4 reg3 = reg4 reg3 + reg6 reg5
+//      result    = operand 1 (or x2, x4, x9, ..., x1024) + result
 
-end:        lw 3, 1, 0x0003                                     // Load result
-            lw 4, 1, 0x0004
-            halt                                                // Halt program
-
-
-// Begining EX8 ----------------------------------------------------------------
-            // Input of EX8:
-            //      reg4 reg3 = reg4 reg3 + reg6 reg5
-            //      result    = operand 1 (or x2, x4, x9, ..., x1024) + result
-
-addOp:      lw 5, 1, 0x0003                                     // Load LSB result in reg 5
-            lw 6, 1, 0x0004                                     // Load MSB of operand 2
+addOp:      lw 5, 1, 0x0003                                       // Load LSB result in reg 5
+            lw 6, 1, 0x0004                                       // Load MSB of operand 2
 
             add 4, 4, 6
             add 3, 3, 5, carr_inc
-            movi 5, <? aft_ex ?>                                // aft_ex addr
+            movi 5, <? aft_ex ?>                                  // aft_ex addr
             jalr 5, 5
-            
+
 carr_inc:   addi 4, 4, 0x0001
 
-aft_ex:     sw 3, 1, 0x0003                                     // Save result (LSB)
-            sw 4, 1, 0x0004                                     // Save result (MSB)
+aft_ex:     sw 3, 1, 0x0003                                       // Save result (LSB)
+            sw 4, 1, 0x0004                                       // Save result (MSB)
 
-            movi 6, <? preloop ?>                               // preloop flag addr
+            movi 6, <? preloop ?>                                 // preloop flag addr
             jalr 6, 6
