@@ -1,5 +1,9 @@
 // Authors : Denis Hoornaert, Nathan Liccardo and Remy Detobel
 // Objective: reg1 * reg2 = reg4(MSB) reg3(LSB)
+// NOT VALID !!! 
+// This version use mask to make shift in one step but this method use negative number and we cann't
+// because we must to use only unsigned number.
+
 
 // Memory organisation:
 // +-----------+-------------------------------------+
