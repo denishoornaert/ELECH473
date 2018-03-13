@@ -1,0 +1,92 @@
+// Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
+// Given the integers representation (complement of 2), the test vectors components have been
+// chosen so that they prove the comparison (lower or equal) right for the complement of 2
+// representation particularities. By particularities, we mean both the fact that there are
+// more negative number than positive (if the 0 is not considered) and the fact that negative
+// numbers have a bigger binary representation. Therefore, the tests generally use either :
+// 	1. 0x8000 (as it is the lowest possible value and has no positive counter part),
+//	2. -1     (as it has the biggest binary representation),
+//	3. 0
+//	4. 1      (as it has the lowest binary representation if 0 is not considered)
+//	5. 0x7fff (as it is the biggest positive value)
+//
+// Consequently, the test vectors are the following :
+//        0 <= 0        -> True
+//       -1 <= 0        -> True
+//        0 <= -1       -> False
+//       -1 <= 1        -> True
+//        1 <= -1       -> False
+//   0x8000 <= 0x7fff   -> True
+//   0x7fff <= 0x8000   -> False
+//   0x8000 <= -1       -> True
+//       -1 <= 0x8000   -> False
+//       -1 <= -1       -> True
+//   0x7fff <= 0x7fff   -> True
+// Some comparisons might seem a bit useless or overkill but : better safe than sorry.
+// For the following code, simply uncomment the test you desired to try and comment the previous one.
+
+			// Reg1 = operand 1
+			// Reg2 = operand 2
+			// Reg3 = result
+			// Reg4 = jump addres
+			// Reg7 = memory address
+
+			MOVI 7, 0x0000  // Memory address
+
+			// --------------- TEST 1 ---------------
+			// 0 <= 0 -> True
+			MOVI 1, 0x0000
+			MOVI 2, 0x0000
+			// --------------- TEST 2 ---------------
+			// -1 <= 0 -> True
+			// MOVI 1, -1
+			// MOVI 2, 0x0000
+			// --------------- TEST 3 ---------------
+			// 0 <= -1 -> True
+			// MOVI 1, 0x0000
+			// MOVI 2, -1
+			// --------------- TEST 4 ---------------
+			// -1 <= 1 -> True
+			// MOVI 1, -1
+			// MOVI 2, 0x0001
+			// --------------- TEST 5 ---------------
+			// 1 <= -1 -> True
+			// MOVI 1, 0x0001
+			// MOVI 2, -1
+			// --------------- TEST 6 ---------------
+			// 0x8000 <= 0x7fff -> True
+			// MOVI 1, 0x8000
+			// MOVI 2, 0x003f
+			// --------------- TEST 7 ---------------
+			// 0x7fff <= 0x8000 -> True
+			// MOVI 1, 0x003f
+			// MOVI 2, 0x8000
+			// --------------- TEST 8 ---------------
+			// 0x8000 <= -1 -> True
+			// MOVI 1, 0x8000
+			// MOVI 2, -1
+			// --------------- TEST 9 ---------------
+			// -1 <= 0x8000 -> True
+			// MOVI 1, -1
+			// MOVI 2, 0x8000
+			// --------------- TEST 10 --------------
+			// -1 <= -1 -> True
+			// MOVI 1, -1
+			// MOVI 2, -1
+			// --------------- TEST 11 --------------
+			// 0x7fff <= 0x7fff -> True
+			// MOVI 1, 0x003f
+			// MOVI 2, 0x003f
+
+
+			BL 1, 2, blTestOne // <
+			MOVI 3, 0x0000
+			MOVI 4, 0x000e // <? endTestOne ?>
+			JALR 4, 4
+
+			// Error
+blTestOne:  MOVI 3, 0x0001
+
+			// Save result
+endTestOne:	SW 3, 7, 0x0000
+            HALT
