@@ -1,0 +1,39 @@
+//         
+//             movi 1, 0xf000     // LSB
+//             movi 4, 0xf000     // MSB
+//             
+//             movi 3, 0x0001     // Number of shift
+//             
+//             shl 4, 4, 3
+//             shl 1, 1, 3, carry
+//             movi 7, <? aftercarry ?>
+//             jalr 7, 7
+//             
+// carry:      addi 4, 4, 0x0001
+// aftercarry: halt
+
+
+
+        
+            movi 3, 0xf0f0     // LSB
+            movi 4, 0xff00     // MSB
+            
+            movi 1, 0x0003     // Number of shift
+            movi 7, 0x0000     // const zero
+
+            sub 2, 7, 1        // reg2 = -reg1
+            nand 5, 7, 7       // reg5 = 0xffff
+            shl 5, 5, 2        // reg5 = reg5 >> reg2
+            nand 5, 5, 5       // not reg5
+
+            nand 5, 3, 5       // Get MSB part of reg3
+            nand 5, 5, 5       // not reg5
+            movi 6, -16        // reg6 = -16
+            add 6, 6, 1        // reg6 = nbr shift-16
+            shl 5, 5, 6        // reg5 = reg5 >> reg6
+            
+            shl 4, 4, 1        // reg4 = reg4 << reg1
+            add 4, 4, 5        // add carry
+            shl 3, 3, 1        // reg3 = reg3 << reg1
+
+            halt

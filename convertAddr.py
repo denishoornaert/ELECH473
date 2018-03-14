@@ -41,13 +41,13 @@ def convertLabel(sourceFile, destFile):
 
         # Double if movi
         splitLine = line.split(" ")
-        if(splitLine[0] == "movi"):
+        if(splitLine[0].lower() == "movi"):
             counter += 1
 
     newFile = open(destFile, 'w')
 
     for label in dictLabel:
-        contenu = contenu.replace("<? " + label + " ?>", "0x{:04x}".format(dictLabel[label]) + " // Addr: " + label)
+        contenu = contenu.replace("<? " + label + " ?>", "0x{:04x}".format(dictLabel[label]) + " // Addr - " + label)
 
     newFile.write(contenu)
 

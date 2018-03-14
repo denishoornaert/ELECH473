@@ -47,7 +47,7 @@
             beq 1, 7, zerodetected
             beq 2, 7, zerodetected
 
-            movi 3, 0x0010 // Addr: endcond                                 // Else : resume
+            movi 3, <? endcond ?>                                 // Else : resume
             jalr 3, 3
 
 zerodetected: movi 3, 0x0000                                      // Result LSB
@@ -83,7 +83,6 @@ comp_loop:  addi 5, 5, -1                                         // Decrementat
             nand 4, 7, 7                                          // reg4 = not (reg7)
 
             beq 6, 5, comp_end                                    // If we have finish to compute all masks
-
             movi 7, 0x0018 // Addr: comp_loop                               // Else jump to the next mask
             jalr 7, 7
 
@@ -107,7 +106,6 @@ comp_end:   movi 5, 0x0000                                        // Result LSB
             add 3, 3, 1                                           // Move op1 in reg3
 
             movi 1, 0x0000
-
             movi 2, 0x0058 // Addr: loop
             jalr 2, 2
 
@@ -166,7 +164,6 @@ leqx:       movi 2, 0x0011                                       // 'Mask memory
             add 7, 7, 2
 
             movi 1, 0x0000
-
             movi 2, 0x0058 // Addr: loop
             jalr 2, 2
 
@@ -182,7 +179,7 @@ endleqx:    movi 1, 0x0000
 
 loop:       sw 7, 1, 0x0005                                     // Save increment
 
-            movi 7, 0x005f // Addr: addOp
+            movi 7, <? addOp ?>
             jalr 7, 7
 
 end:        lw 3, 1, 0x0003                                     // Load result
@@ -238,21 +235,18 @@ addOp:      lw 5, 1, 0x0003                                     // Load LSB resu
             // represents the carry. Finally, the carry is added to the content of the register 4 (the msb part).
 test_one:   beq 4, 2, one_rone
             movi 4, 0x0000                                      // Else
-
             movi 5, 0x0079 // Addr: test_two                              // test_two addr
             jalr 5, 5
 
 one_rone:   movi 4, 0x0001                                      // If
 
 test_two:   beq 6, 2, one_two
-
             movi 5, 0x007e // Addr: test_sum                              // test_sum addr
             jalr 5, 5
 
 one_two:    addi 4, 4, 0x0001                                   // Incrementation of the MSB part
 
 test_sum:   beq 7, 2, one_sum
-
             movi 5, 0x0083 // Addr: sec_part                              // sec_part addr
             jalr 5, 5
 
@@ -268,7 +262,6 @@ sec_part:   movi 2, 0x0002                                      // Mask used to 
             add 4, 4, 5
 
             beq 2, 6, carr_inc                                  // If the second bit of the "carry" sum is 1 : increment
-
             movi 5, 0x008f // Addr: aft_ex                                // Otherwise : jump to the end
             jalr 5, 5
 
@@ -302,7 +295,6 @@ savexloop:  addi 1, 1, -1
             addi 5, 5, 1                                        // Complement of 2
             add 5, 6, 5
             beq 5, 7, savex
-
             movi 5, 0x0097 // Addr: savexloop                             // else
             jalr 5, 5
 
@@ -310,5 +302,5 @@ savexloop:  addi 1, 1, -1
 savex:      sw 3, 1, 0x000a                                     // load the LSB (masks memory zone + 10)
             sw 4, 1, 0x0014                                     // load the MSB (masks memory zone + 20)
 
-after_save: movi 6, 0x0036 // Addr: preloop                               // preloop flag addr
+after_save: movi 6, <? preloop ?>                               // preloop flag addr
             jalr 6, 6

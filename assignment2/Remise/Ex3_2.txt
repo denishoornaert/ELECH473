@@ -1,0 +1,18 @@
+// Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
+// Objective : implementing the operator '*' for two 32 bits integers using the IS[2] instructions.
+
+movi 1, 0xffff
+movi 2, 0xffff
+
+// Simple call to the built-in operator.
+mul 4, 1, 2
+
+// Because the built-in operator use the little-endian memory management, the result's
+// MSB is saved in the register 3 and the result's LSB in the register 4 whereas the
+// assignment specifies that the opposite (MSB in register 4 and LSB in register 3).
+// Therefore, a simple swap using register 5 is a buffer is performed.
+movi 7, 0x0000
+add 5, 7, 4      // Save reg4 in reg5
+add 4, 7, 3
+add 3, 7, 5
+halt

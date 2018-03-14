@@ -1,0 +1,79 @@
+// Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
+// Objective : implementing the operator '<=' using only the 8 basic instructions.
+
+                    MOVI 1, 0x0000
+                    MOVI 2, 0x0001
+
+// Test whether operand 1 is equal to operand 2. If yes, then true. Otherwise, resume.
+                    BEQ 1, 2, isLowerOrEqual
+
+// Test whether operand 1 or operand 2 is equal to -64 (as 64 is not 'representable')
+// If yes, then true as nothing can be bigger than -64. Otherwise, resume.
+                    MOVI 3, -64
+                    BEQ 1, 3, isLowerOrEqual
+                    BEQ 2, 3, isBigger
+
+// Set up of two masks used just after for isolating the MSB of the two operands.
+                    MOVI 3, 0x7fff                          // Mask 011...11
+                    MOVI 4, 0x8000                          // Mask 100...00
+                    NAND 5, 4, 1                            // Get MSB of operand 1
+                    NAND 6, 4, 2                            // Get MSB of operand 2
+
+// Test whether the MSB of operand 1 is equal to 1.
+// If yes, resume in 'oneNegative'. Otherwise, test whether the MSB of operand 2 is equal to 1.
+// If the second test is true, resume in 'twoNegative'. Otherwise, resume and it means that both
+// operand 1 and operand 2 are positive.
+                    BEQ 5, 3, oneNegative
+                    // First not negative
+                    BEQ 6, 3, isBigger                      // If second is negative and one is positive: op1 > op2
+                    // Second not negative
+
+
+// -------------- op1 and op2 are positive --------------
+
+// Since we know that both operands are positives, we determine the opposite of operand 2 by
+// reversing the complement of 2 conversion method. Then we subtract operand 1 operand 2 before
+// checking the sign of the obtained difference in 'isNegative'.
+                    ADDI 2, 2, -1                           // reg2 = reg2 - 1
+                    NAND 2, 2, 2                            // Not 2
+
+                    ADD 5, 1, 2
+                    NAND 5, 4, 5                            // Get MSB 1 bit of difference
+
+                    BEQ 3, 5, isLowerOrEqual                // Difference is negative: op1 <= op2
+                    // Difference positive
+                    MOVI 7, <? isBigger ?>
+                    JALR 7, 7
+
+
+// We know that op1 is negative, we test if op2 is also negative and jump to 'oneAndTwoNegative' if it's true. Otherwise,
+// we know that op1 is negative and op2 is positive. Thus op1 < op2.
+oneNegative:        BEQ 3, 6, oneAndTwoNegative
+                    // First negative, second positive
+
+                    // Thus condition is ok
+                    MOVI 7, <? isLowerOrEqual ?>
+                    JALR 7, 7
+
+
+// As both register 1 and 2 are known to be negative, register 1 is replaced by its positive counterpart so that a meaningful
+// difference of the two registers can be operated. Then we check the sign of the result.
+oneAndTwoNegative:  ADDI 1, 1, -1                           // reg1 = reg1 - 1
+                    NAND 1, 1, 1                            // Not 1
+
+                    ADD 5, 1, 2
+                    NAND 5, 4, 5                            // Get MSB 1 bit of difference
+
+                    BEQ 3, 5, isBigger
+                    // Difference positive
+                    MOVI 7, <? isLowerOrEqual ?>
+                    JALR 7, 7
+
+
+// The following lines consist just in setting the register 1 to either 0xdddd (if r1<=r2) or 0xffff (if r1>r2).
+isBigger:           MOVI 1, 0xdddd // means that operand 2 is lower than operand 1 (value arbitrarily set)
+                    MOVI 7, <? end ?>
+                    JALR 7, 7
+
+isLowerOrEqual:     MOVI 1, 0xffff // means that operand 1 is lower than operand 2 or equal (value arbitrarily set)
+end:                halt

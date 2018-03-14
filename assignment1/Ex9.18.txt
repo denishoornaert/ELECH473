@@ -1,5 +1,4 @@
 // Authors : Denis Hoornaert (000413326), Nathan Liccardo (000408278) and Remy Detobel (000408013)
-
 // Objective: reg4(MSB) reg3(LSB) = reg1 * reg2
 // The present code performs the multiplication of two unsigned integers by adding x times the content of the register 1
 // to the result of the previous addition (where x is the content of the register 2). Furthermore, in order to reduce the
@@ -33,7 +32,6 @@
 
 
             // Init entries (instructions for local test purposes)
-
             // movi 1, 0xffff                                        // Operand 1 LSB (used as base for every addition)
             // movi 2, 0x0007                                        // Operand 2 LSB (used for comparison with counter)
             nop

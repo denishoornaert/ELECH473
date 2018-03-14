@@ -1,0 +1,143 @@
+// Authors : Denis Hoornaert, Nathan Liccardo and Remy Detobel
+// Objective: reg1 * reg2 = reg4(MSB) reg3(LSB)
+// NOT VALID !!! 
+// This version use mask to make shift in one step but this method use negative number and we cann't
+// because we must to use only unsigned number.
+
+
+// Memory organisation:
+// +-----------+-------------------------------------+
+// | addr      | content                             |
+// +-----------+-------------------------------------+
+// | 0x01  [1] | operand 1                           |
+// | 0x02  [2] | operand 2                           |
+// | 0x03  [3] | result LSB                          |
+// | 0x04  [4] | result MSB                          |
+// | 0x05  [5] | counter                             |
+// | 0x06  [6] | MSB of the operand 1 (used for sum) |
+// +-----------+-------------------------------------+
+
+
+            // Init entries
+            movi 1, 0xffff                                        // Operand 1 LSB (used as base for every addition)
+            movi 2, 0x0007                                        // Operand 2 LSB (used for comparison with counter)
+            // nop
+            // nop
+            // nop
+            // nop
+
+
+            movi 3, 0x0000                                        // Null value
+            beq 1, 3, zerodetected
+            beq 2, 3, zerodetected
+
+            movi 7, <? endcond ?>                                 // Else : resume
+            jalr 7, 7
+
+zerodetected: movi 4, 0x0000                                      // Result MSB
+            halt                                                  // If : halt
+
+            // Test if op1 < op2
+endcond:    bl 2, 1, init                                         // If op2 < op1 -> jump to init
+            // Else: inverse reg1 and reg2
+            add 7, 1, 3                                           // Save reg1 in reg7
+            add 1, 2, 3                                           // reg2 in reg1
+            add 2, 7, 3                                           // save of reg1 in reg2
+
+            // Init
+init:       movi 5, 0x0000                                        // Result LSB
+            movi 6, 0x0000                                        // Result MSB
+            add 7, 3, 2                                           // Counter = op2 (& reg3 = 0)
+
+            // Save context                                       // Memory
+            sw 1, 3, 0x0001                                       // 1.  operand 1 (add on every loop)
+            sw 2, 3, 0x0002                                       // 2.  operand 2 (used to check whether x2 can be saved)
+            sw 5, 3, 0x0003                                       // 3.  result LSB
+            sw 6, 3, 0x0004                                       // 4.  result MSB
+
+            movi 1, 0x0000
+            movi 2, <? loop ?>
+            jalr 2, 2
+
+preloop:    addi 5, 1, 1                                          // movi 5, 0x0001 in ONE instruction
+            sub 7, 7, 5                                           // Decrement of the counter
+            
+            beq 7, 1, end
+            movi 5, <? loop ?>
+            jalr 5, 5
+
+end:        lw 3, 1, 0x0003                                       // Load result
+            lw 4, 1, 0x0004
+            halt                                                  // Halt program
+
+
+            // Here we have:
+            // 1: memory start address
+            // 2: mask
+            // 3: op1
+            // 4: op1 (MSB)
+            // 5: use for comparison
+            // 6: use for comparison
+            // 7: counter
+
+loop:       movi 2, 0x000a                                        // Counter number of shift
+            movi 6, 0x03ff                                        // Test bigger
+
+            lw 3, 1, 0x0001                                       // LSB for operand 1 x1
+            movi 4, 0x0000                                        // MSB for operand 1 x1
+
+testBig:    beq 1, 2, sumOp
+            bg 7, 6, bigger
+            addi 5, 1, 1                                          // movi 5, 0x0001 in ONE instruction :)
+            sub 2, 2, 5
+            shifti 6, 6, -1
+            movi 5, <? testBig ?>
+            jalr 5, 5
+
+
+            // reg2 = nbr of shift
+            // reg3 = LSB
+            // reg4 = MSB
+            // reg6 = max number < of the shift
+            // reg7 = counter
+
+            // reg5 = -nbr shift
+
+bigger:     sub 7, 7, 6
+
+            movi 1, 0x0000
+            sub 5, 1, 2                                           // reg2 = -reg2
+            nand 6, 1, 1                                          // reg6 = 0xffff
+            shl 6, 6, 5                                           // reg6 = reg6 >> reg5 (-nbr shift)
+            nand 6, 6, 6                                          // not reg6
+
+            nand 6, 3, 6                                          // Get MSB part of reg3 (LSB)
+            nand 6, 6, 6                                          // Not reg6
+            movi 1, -16
+            add 1, 1, 2                                           // reg1 = -16 + nbr shift
+            shl 6, 6, 1                                           // shift reg6 to right
+
+            shl 3, 3, 2                                           // Shift LSB
+            shl 4, 4, 2                                           // Shift MSB
+            add 4, 4, 6                                           // Add "carry"
+            movi 1, 0x0000
+
+// ----------------------------------------------------------------
+            //      reg4 reg3 = reg4 reg3 + reg6 reg5
+            //      result    = operand 1 (or x2, x4, x9, ..., x1024) + result
+
+sumOp:      lw 5, 1, 0x0003                                       // Load LSB result in reg 5
+            lw 6, 1, 0x0004                                       // Load MSB of operand 2
+
+            add 4, 4, 6
+            add 3, 3, 5, carr_inc
+            movi 5, <? aft_ex ?>                                  // aft_ex addr
+            jalr 5, 5
+            
+carr_inc:   addi 4, 4, 0x0001
+
+aft_ex:     sw 3, 1, 0x0003                                       // Save result (LSB)
+            sw 4, 1, 0x0004                                       // Save result (MSB)
+
+            movi 6, <? preloop ?>                                 // preloop flag addr
+            jalr 6, 6
