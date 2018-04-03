@@ -56,7 +56,7 @@ start:		mov acc, stack		# acc = b, bak = a, stack = ba
 		sub stack		# acc = b', bak = a, stack = b where b' = b-a
 		jlz lz			# acc < 0 <=> a > b
 		jez ez			# acc = 0 <=> a = b
-ge:		jmp start		# acc > 0 <=> a < b				
+ge:		jmp start		# acc > 0 <=> a < b
 lz:		neg acc			# acc = a', bak = a, stack = b where a' = -b' = -(b-a) = a-b
 		swp			# acc = a, bak = a', stack = b where a' = -b' = -(b-a) = a-b
 		mov stack, acc		# acc = b, bak = a', stack = _ where a' = -b' = -(b-a) = a-b
@@ -66,24 +66,62 @@ ez:		mov acc, down		# return acc
 
 # VERSION 4. Hypothesis : same as version 3 + switch order of arrival between in.a and in.b
 
-		mov in.b, acc		# 			acc = b, bak = _, stack = _
-		mov acc, stack		# 			acc = b, bak = _, stack = b
-		sav			# 			acc = b, bak = b, stack = b
-		mov in.a, acc		# 			acc = a, bak = b, stack = b
+			mov in.b, acc		# 			acc = b, bak = _, stack = _
+			mov acc, stack		# 			acc = b, bak = _, stack = b
+			sav					# 			acc = b, bak = b, stack = b
+			mov in.a, acc		# 			acc = a, bak = b, stack = b
 AccToStkX2:	mov acc, stack		# 			acc = a, bak = b, stack = ab
 AccToStkX1:	mov acc, stack		# 			acc = a, bak = b, stack = aab
-		swp			# 			acc = b, bak = a, stack = aab
-		sub stack		# 			acc = b', bak = a, stack = ab where b' = b-a
-		jlz lz			# acc < 0 <=> a > b
-		jez ez			# acc = 0 <=> a = b
-ge:		swp			# acc > 0 <=> a < b; 	acc = a, bak = b', stack = ab where b' = b-a
-		jmp AccToStkX1						
-lz:		mov stack, nil		#			acc = b', bak = a, stack = b where b' = b-a
-		neg acc			# 			acc = a', bak = a, stack = b where a' = -b' = -(b-a) = a-b
-		swp			# 			acc = a, bak = a', stack = b where a' = -b' = -(b-a) = a-b
-		mov stack, acc		# 			acc = b, bak = a', stack = _ where a' = -b' = -(b-a) = a-b
-		mov acc, stack		# 			acc = b, bak = a', stack = b where a' = -b' = -(b-a) = a-b
-		swp			# 			acc = a', bak = b, stack = b where a' = -b' = -(b-a) = a-b
-		jmp AccToStkX2
-ez:		mov acc, down		# return acc
+			swp					# 			acc = b, bak = a, stack = aab
+			sub stack			# 			acc = b', bak = a, stack = ab where b' = b-a
+			jlz lz				# acc < 0 <=> a > b
+			jez ez				# acc = 0 <=> a = b
+ge:			swp					# acc > 0 <=> a < b; 	acc = a, bak = b', stack = ab where b' = b-a
+			jmp AccToStkX1
+lz:			mov stack, nil		#			acc = b', bak = a, stack = b where b' = b-a
+			neg acc				# 			acc = a', bak = a, stack = b where a' = -b' = -(b-a) = a-b
+			swp					# 			acc = a, bak = a', stack = b where a' = -b' = -(b-a) = a-b
+			mov stack, acc		# 			acc = b, bak = a', stack = _ where a' = -b' = -(b-a) = a-b
+			mov acc, stack		# 			acc = b, bak = a', stack = b where a' = -b' = -(b-a) = a-b
+			swp					# 			acc = a', bak = b, stack = b where a' = -b' = -(b-a) = a-b
+			jmp AccToStkX2
+ez:			mov acc, down		# return acc
 
+# VERSION 5. Hypothesis : same as version 3 + switch order of arrival between in.a and in.b
+
+			mov in.b, acc		# 			acc = b, bak = _, stack = _
+			mov acc, stack		# 			acc = b, bak = _, stack = b
+			sav					# 			acc = b, bak = b, stack = b
+			mov in.a, acc		# 			acc = a, bak = b, stack = b
+AccToStkX1:	swp					#			acc = b, bak = a, stack = b
+			mov acc, stack		# 			acc = a, bak = b, stack = ab
+			swp					# 			acc = b, bak = a, stack = ab
+			sub stack			# 			acc = b', bak = a, stack = b where b' = b-a
+			jlz lz				# acc < 0 <=> a > b
+			jez ez				# acc = 0 <=> a = b
+ge:			jmp AccToStkX1
+lz:			neg acc				# 			acc = a', bak = a, stack = b where a' = -b' = -(b-a) = a-b
+			swp					# 			acc = a, bak = a', stack = b where a' = -b' = -(b-a) = a-b
+			mov stack, acc		# 			acc = b, bak = a', stack = _ where a' = -b' = -(b-a) = a-b
+			mov acc, stack		# 			acc = b, bak = a', stack = b where a' = -b' = -(b-a) = a-b
+			jmp AccToStkX1
+ez:			mov acc, down		# return acc
+
+# VERSION 6. Hypothesis : same as version 3 + switch order of arrival between in.a and in.b
+
+			mov in.b, acc		# 			acc = b, bak = _, stack = _
+			mov acc, stack		# 			acc = b, bak = _, stack = b
+			sav					# 			acc = b, bak = b, stack = b
+			mov in.a, acc		# 			acc = a, bak = b, stack = b
+AccToStkX1:	swp					#			acc = b, bak = a, stack = b
+			mov acc, stack		# 			acc = a, bak = b, stack = ab
+			swp					# 			acc = b, bak = a, stack = ab
+			sub stack			# 			acc = b', bak = a, stack = b where b' = b-a
+			jez ez				# acc = 0 <=> a = b
+			jgz gz				# acc > 0 <=> a < b
+lz:			neg acc				# 			acc = a', bak = a, stack = b where a' = -b' = -(b-a) = a-b
+			swp					# 			acc = a, bak = a', stack = b where a' = -b' = -(b-a) = a-b
+			mov stack, acc		# 			acc = b, bak = a', stack = _ where a' = -b' = -(b-a) = a-b
+			mov acc, stack		# 			acc = b, bak = a', stack = b where a' = -b' = -(b-a) = a-b
+gz:			jmp AccToStkX1
+ez:			mov acc, down		# return acc
