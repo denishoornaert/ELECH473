@@ -1,4 +1,4 @@
-# Lab 1 : assignment 1.
+# Lab 6 : assignment 3.
 
 ## Coprime finder exercise
 | version |   cycles   |   nodes   | instruct. |
