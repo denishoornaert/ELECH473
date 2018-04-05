@@ -3,10 +3,32 @@
 #include <string.h>
 
 #define SIZE 1048576
+#define SAMPLING_SIZE 100 // max 255
 
-void cVersion() {
+void initArray(unsigned char* array, unsigned char value, unsigned int size) {
+    unsigned int i;
+    for(i = 0; i < size; i++) {
+        array[i] = value;
+    }
+}
+
+// TODO add median stat
+void getStatistics(float* dts, float* min, float* max, float* avg) {
+    unsigned char i;
+    for(i = 0; i < SAMPLING_SIZE; i++) {
+        *avg += dts[i];
+        if(dts[i] < *min) {
+            *min = dts[i];
+        }
+        if(*max < dts[i]) {
+            *max = dts[i];
+        }
+    }
+    *avg /= SAMPLING_SIZE;
+}
+
+void cVersion(float* dt) {
     time_t start, end;
-    float dt;
 
     unsigned char threshold = 75;
     unsigned char buffer[SIZE];
@@ -19,14 +41,14 @@ void cVersion() {
     fclose(fp);
 
     start = clock();
+
     unsigned int index;
     for(index = 0; index < SIZE; index++) {
         buffer[index] = (buffer[index] < threshold) ? 0 : 255;
     }
 
     end = clock();
-    dt = (end - start)/(float)(CLOCKS_PER_SEC);
-    printf("Time: %f", dt);
+    *dt = (end - start)/(float)(CLOCKS_PER_SEC);
 
     fwrite(buffer, sizeof(unsigned char), SIZE, foutput);
     fclose(foutput);
@@ -36,9 +58,8 @@ void asmVersion() {
     time_t start, end;
     float dt;
 
-    unsigned char valTreshold = 75;
     unsigned char threshold[16];
-    memcpy(threshold, &valTreshold, 16);
+    initArray(threshold, 75, 16);
     unsigned char buffer[SIZE];
 
     FILE *fp;
@@ -51,36 +72,46 @@ void asmVersion() {
 
     start = clock();
 
-
-    // asm code motherfucker
-    /*__asm__ {
-        "mov %[in], %%esi\n"
-        "mov $75, %%eax\n"
-    "loop:\n"
-        "mov (%%esi), %%ebx\n"
-        "cmp %%esi, %%eax\n" // TODO compare
-        "jb zero\n"
-        "\n" // write 255
-    "zero:\n"
-        "\n" // write 0
-        "add %%esi, $1\n"
-        "\n" // Compare with %[l]
-        "\n" // Jump to loop if != 0
-        :"=m"(buffer) // Outputs
-        :[in]"m"(buffer), [1]"m" (SIZE): // inputs
-        "esi", "ecx", "eax", "ebx"
-    }*/
+    asm("movdqu %0, %%xmm7\n"
+        "movdqu %%xmm6, %%xmm1\n"
+        "paddb %%xmm7, %%xmm6\n"
+        "movdqu %%xmm7, %0"
+        : "=r" (threshold)
+        : "0" (threshold)
+    );
 
     end = clock();
     dt = (end - start)/(float)(CLOCKS_PER_SEC);
-    printf("Time: %f", dt);
+    printf("Time: %f\n", dt);
+    printf("[");
+    unsigned char i;
+    for(i = 0; i < 16; i++) {
+        printf("%u", threshold[i]);
+    }
+    printf("]\n");
 
     fwrite(buffer, sizeof(unsigned char), SIZE, foutput);
     fclose(foutput);
 }
 
 int main() {
-    cVersion();
+    /*
+    float dts[SAMPLING_SIZE];
+    float min;
+    float max;
+    float avg;
+
+    unsigned char i;
+    for(i = 0; i < SAMPLING_SIZE; i++) {
+        cVersion(&dts[i]);
+        // asmVersion();
+    }
+
+    getStatistics(dts, &min, &max, &avg);
+    printf("min : %f\tmax : %f\tavg : %f\n", min, max, avg);
+    */
+
     asmVersion();
+
     return 0;
 }
