@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define SIZE 1048576
+#define LOOP 65536
 #define SAMPLING_SIZE 100 // max 255
 
 void initArray(unsigned char* array, unsigned char value, unsigned int size) {
@@ -59,7 +60,9 @@ void asmVersion() {
     float dt;
 
     unsigned char threshold[16];
-    initArray(threshold, 75, 16);
+    initArray(threshold, 75-128, 16);
+    unsigned char counterC2[16];
+    initArray(counterC2, 128, 16);
     unsigned char buffer[SIZE];
 
     FILE *fp;
@@ -72,13 +75,26 @@ void asmVersion() {
 
     start = clock();
 
-    asm("movdqu %0, %%xmm7\n"
-        "movdqu %%xmm6, %%xmm1\n"
-        "paddb %%xmm7, %%xmm6\n"
-        "movdqu %%xmm7, %0"
-        : "=r" (threshold)
-        : "0" (threshold)
-    );
+    __asm__("mov $65536, %%edx;\n"
+            "mov %[thr], %%eax;\n"
+            "mov %[buf], %%ebx;\n"
+            "mov %[cc2], %%ecx;\n"
+            "movdqu (%%ecx), %%xmm2;\n"
+            "movdqu (%%eax), %%xmm0;\n"
+            "loop: movdqu (%%ebx), %%xmm1;\n"
+            "psubb %%xmm2, %%xmm1;\n"
+            "pcmpgtb %%xmm0, %%xmm1;\n"
+            "movdqu %%xmm1, (%%ebx);\n"
+            "add $16, %%ebx;\n"
+            "sub $1, %%edx;\n"
+            "mov $0, %%esi;\n"
+            "cmp %%edx, %%esi;\n"
+            "jnz loop;\n"
+            : "=m" (buffer) // Output
+            : [thr]"r" (threshold), [buf]"r" (buffer), [cc2]"r" (counterC2)  // Input
+            : "xmm0", "eax", "ebx", "ecx"
+        );
+
 
     end = clock();
     dt = (end - start)/(float)(CLOCKS_PER_SEC);
@@ -86,7 +102,11 @@ void asmVersion() {
     printf("[");
     unsigned char i;
     for(i = 0; i < 16; i++) {
-        printf("%u", threshold[i]);
+        printf("%u, ", threshold[i]);
+    }
+    printf("]\n");
+    for(i = 0; i < 16; i++) {
+        printf("%u, ", buffer[i]);
     }
     printf("]\n");
 
@@ -115,3 +135,4 @@ int main() {
 
     return 0;
 }
+
