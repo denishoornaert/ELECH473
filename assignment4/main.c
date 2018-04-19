@@ -4,7 +4,7 @@
 
 #define SIZE 1048576
 #define LOOP 65536
-#define SAMPLING_SIZE 100 // max 255
+#define SAMPLING_SIZE 1000
 
 void initArray(unsigned char* array, unsigned char value, unsigned int size) {
     unsigned int i;
@@ -13,7 +13,6 @@ void initArray(unsigned char* array, unsigned char value, unsigned int size) {
     }
 }
 
-// TODO add median stat
 void getStatistics(float* dts, float* min, float* max, float* avg) {
     unsigned char i;
     for(i = 0; i < SAMPLING_SIZE; i++) {
@@ -33,6 +32,7 @@ void cVersion(float* dt) {
 
     unsigned char threshold = 75;
     unsigned char buffer[SIZE];
+
     FILE *fp;
     fp = fopen("test.raw", "rb");
     FILE *foutput;
@@ -55,9 +55,8 @@ void cVersion(float* dt) {
     fclose(foutput);
 }
 
-void asmVersion() {
+void asmVersion(float* dt) {
     time_t start, end;
-    float dt;
 
     unsigned char threshold[16];
     initArray(threshold, 75-128, 16);
@@ -97,42 +96,30 @@ void asmVersion() {
 
 
     end = clock();
-    dt = (end - start)/(float)(CLOCKS_PER_SEC);
-    printf("Time: %f\n", dt);
-    printf("[");
-    unsigned char i;
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", threshold[i]);
-    }
-    printf("]\n");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", buffer[i]);
-    }
-    printf("]\n");
+    *dt = (end - start)/(float)(CLOCKS_PER_SEC);
 
     fwrite(buffer, sizeof(unsigned char), SIZE, foutput);
     fclose(foutput);
 }
 
 int main() {
-    /*
     float dts[SAMPLING_SIZE];
     float min;
     float max;
     float avg;
+    unsigned int i;
 
-    unsigned char i;
     for(i = 0; i < SAMPLING_SIZE; i++) {
         cVersion(&dts[i]);
-        // asmVersion();
     }
-
     getStatistics(dts, &min, &max, &avg);
     printf("min : %f\tmax : %f\tavg : %f\n", min, max, avg);
-    */
 
-    asmVersion();
+    for(i = 0; i < SAMPLING_SIZE; i++) {
+        asmVersion(&dts[i]);
+    }
+    getStatistics(dts, &min, &max, &avg);
+    printf("min : %f\tmax : %f\tavg : %f\n", min, max, avg);
 
     return 0;
 }
-
