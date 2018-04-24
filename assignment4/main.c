@@ -5,7 +5,7 @@ Authors :
     - Remy Detobel (000408013)
 
 After having implemented the algorithm in C and in ASM (using SIMD), we launched
-the program four times in order to get an insight of the performance difference.
+the program two times in order to get an insight of the performance difference.
 The first and second launches of the program use both 10,000 samples but where
 respectively compiled using the debug and the release mode.
 
