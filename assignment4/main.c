@@ -31,7 +31,7 @@ The difference between the 'Debug' and the 'Release' modes could be explain by
 the fact that, in 'Release', mode some optimization are performed. In addition,
 the 'Debug' mode could also add some information or initialization. For example,
 some 'Debug' modes initialize automatically variables to zero. On the other
-hand, the 'Release' mode optimizeq the code and do not save unnecessary information.
+hand, the 'Release' mode optimizes the code and do not save unnecessary information.
 
 Therefore, we draw as a conclusion that if an algorithm can benefit from a
 parallelization optimization (like in our case) then spending time on
