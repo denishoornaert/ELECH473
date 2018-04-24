@@ -6,13 +6,11 @@ Authors :
 
 After having implemented the algorithm in C and in ASM (using SIMD), we launched
 the program four times in order to get an insight of the performance difference.
-The first and second launches of the program use 1,000 samples and where
+The first and second launches of the program use both 10,000 samples but where
 respectively compiled using the debug and the release mode.
-On the other hand, the third and the fourth launches use 10,000 samples and
-where also compiled using respectively the debug and the release mode.
 
 --------------------------------------------------------------------------------
-Samples : 10 000
+Samples : 10,000
 
 Debug
 C   -> min : 0.000000  max : 0.016000  avg : 0.002899
@@ -35,10 +33,10 @@ the 'Debug' mode could also add some information or initialization. For example,
 some 'Debug' modes initialize automatically variables to zero. On the other
 hand, the 'Release' mode optimizeq the code and do not save unnecessary information.
 
-Therefore, we draw as a conclusion that if an algorithm can
-benefit from a parallelization optimization (like in our case) then spending
-time on implementing an SIMD version is a good idea as the compiler are not
-mature enough to use those kings of accelerations properly.
+Therefore, we draw as a conclusion that if an algorithm can benefit from a
+parallelization optimization (like in our case) then spending time on
+implementing an SIMD version is a good idea as the compiler are not mature
+enough to use those kings of accelerations/optimization properly.
 */
 
 #include <stdio.h>
