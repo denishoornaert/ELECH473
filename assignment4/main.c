@@ -1,3 +1,46 @@
+/*
+Authors :
+    - Denis Hoornaert (000413326)
+    - Nathan Liccardo (000408278)
+    - Remy Detobel (000408013)
+
+After having implemented the algorithm in C and in ASM (using SIMD), we launched
+the program four times in order to get an insight of the performance difference.
+The first and second launches of the program use 1,000 samples and where
+respectively compiled using the debug and the release mode.
+On the other hand, the third and the fourth launches use 10,000 samples and
+where also compiled using respectively the debug and the release mode.
+
+--------------------------------------------------------------------------------
+Samples : 10 000
+
+Debug
+C   -> min : 0.000000  max : 0.016000  avg : 0.002899
+ASM -> min : 0.000000  max : 0.016000  avg : 0.000097
+    => Factor of 29
+
+Release
+C   -> min : 0.000000  max : 0.016000  avg : 0.000963
+ASM -> min : 0.000000  max : 0.016000  avg : 0.000091
+    => Factor of 10
+--------------------------------------------------------------------------------
+
+We can easily see that, no matter the compilation mode used, the average time
+required by the ASM (SIMD based) algorithm is far inferior to the one required
+by the C version.
+
+The difference between the 'Debug' and the 'Release' modes could be explain by
+the fact that, in 'Release', mode some optimization are performed. In addition,
+the 'Debug' mode could also add some information or initialization. For example,
+some 'Debug' modes initialize automatically variables to zero. On the other
+hand, the 'Release' mode optimizeq the code and do not save unnecessary information.
+
+Therefore, we draw as a conclusion that if an algorithm can
+benefit from a parallelization optimization (like in our case) then spending
+time on implementing an SIMD version is a good idea as the compiler are not
+mature enough to use those kings of accelerations properly.
+*/
+
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
@@ -90,7 +133,7 @@ void asmVersion(float* dt) {
             "cmp %%edx, %%esi;\n"
             "jnz loop;\n"
             : "=m" (buffer) // Output
-            : [thr]"r" (threshold), [buf]"r" (buffer), [cc2]"r" (counterC2)  // Input
+            : [thr]"r" (threshold), [buf]"r" (buffer), [cc2]"r" (counterC2)
             : "xmm0", "eax", "ebx", "ecx"
         );
 
