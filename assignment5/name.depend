@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1524040790 source:c:\users\labo\desktop\lab7\name\main.c
+	<stdio.h>
+	<time.h>
+	<string.h>
+
+1524646124 source:c:\users\labo\desktop\lab7\assignment5\main.c
+	<stdio.h>
+	<time.h>
+	<string.h>
+
