@@ -8,7 +8,7 @@
 #define LOOP 65536
 #define SAMPLING_SIZE 100 // max 255
 #define PIXELS 1024
-#define SQUALE_SIZE 3
+#define SCALE 3
 
 void getStatistics(float* dts, float* min, float* max, float* avg) {
     unsigned char i;
@@ -53,24 +53,24 @@ void cVersion(float* dt) {
     // ASM equivalent
     unsigned char* line = malloc(sizeof(unsigned char) * PIXELS);
     unsigned int lineIndex;
-    for(lineIndex = 0; lineIndex < (PIXELS*PIXELS)-SQUALE_SIZE; lineIndex += PIXELS) {
+    for(lineIndex = 0; lineIndex < (PIXELS*PIXELS)-SCALE; lineIndex += PIXELS) {
 
         // MAX VALUE
         unsigned int i;
         for(i = 0; i < PIXELS; ++i) {
             int value = INT_MIN;
             unsigned int index;
-            for(index = 0; index < SQUALE_SIZE; ++index) {
+            for(index = 0; index < SCALE; ++index) {
                 value = getMaxValue(value, buffer[lineIndex + (index*PIXELS)+i]);
             }
             line[i] = value;
         }
 
         // FINAL max value in line
-        for(i = 0; i < PIXELS-SQUALE_SIZE; ++i) {
+        for(i = 0; i < PIXELS-SCALE; ++i) {
             int value = INT_MIN;
             unsigned int index;
-            for(index = 0; index < SQUALE_SIZE && i+index < PIXELS; ++index) {
+            for(index = 0; index < SCALE && i+index < PIXELS; ++index) {
                 value = getMaxValue(value, line[i+index]);
             }
             bufferOut[lineIndex+i] = value;
@@ -80,16 +80,16 @@ void cVersion(float* dt) {
         for(i = 0; i < PIXELS; ++i) {
             int value = INT_MAX;
             unsigned int index;
-            for(index = 0; index < SQUALE_SIZE; ++index) {
+            for(index = 0; index < SCALE; ++index) {
                 value = getMinValue(value, buffer[lineIndex + (index*PIXELS)+i]);
             }
             line[i] = value;
         }
         // Shift value and final value
-        for(i = 0; i < PIXELS-SQUALE_SIZE; ++i) {
+        for(i = 0; i < PIXELS-SCALE; ++i) {
             int value = INT_MAX;
             unsigned int index;
-            for(index = 0; index < SQUALE_SIZE && i+index < PIXELS; ++index) {
+            for(index = 0; index < SCALE && i+index < PIXELS; ++index) {
                 value = getMinValue(value, line[i+index]);
             }
             bufferOut[lineIndex+i] -= value;
@@ -227,4 +227,3 @@ int main() {
 
     return 0;
 }
-
