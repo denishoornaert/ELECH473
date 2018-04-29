@@ -30,20 +30,24 @@ void shift(unsigned char* array, int n) {
         *i = 0;
 }
 
-int getMaxValue(unsigned char one, unsigned char two, unsigned char three, unsigned char four, unsigned char five) {
-    if (one >= two && one >= three && one >= four && one >= five) return one;
-    if (two >= one && two >= three && two >= four && two >= five) return two;
-    if (three >= one && three >= two && three >= four && three >= five) return three;
-    if (four >= one && four >= two && four >= three && four >= five) return four;
-    return five;
+int getMaxValue(unsigned char one, unsigned char two, unsigned char three, unsigned char four, unsigned char five, unsigned char six, unsigned char seven) {
+    if (one >= two && one >= three && one >= four && one >= five && one >= six && one >= seven) return one;
+    if (two >= one && two >= three && two >= four && two >= five && two >= six && two >= seven) return two;
+    if (three >= one && three >= two && three >= four && three >= five && three >= six && three >= seven) return three;
+    if (four >= one && four >= two && four >= three && four >= five && four >= six && four >= seven) return four;
+    if (five >= one && five >= two && five >= three && five >= four && five >= six && five >= seven) return four;
+    if (six >= one && six >= two && six >= three && six >= four && six >= five && six >= seven) return four;
+    return seven;
 }
 
-int getMinValue(unsigned char one, unsigned char two, unsigned char three, unsigned char four, unsigned char five) {
-    if (one <= two && one <= three && one <= four && one <= five) return one;
-    if (two <= one && two <= three && two <= four && two <= five) return two;
-    if (three <= one && three <= two && three <= four && three <= five) return three;
-    if (four <= one && four <= two && four <= three && two <= five) return four;
-    return five;
+int getMinValue(unsigned char one, unsigned char two, unsigned char three, unsigned char four, unsigned char five, unsigned char six, unsigned char seven) {
+    if (one <= two && one <= three && one <= four && one <= five && one <= six && one <= seven) return one;
+    if (two <= one && two <= three && two <= four && two <= five && two <= six && two <= seven) return two;
+    if (three <= one && three <= two && three <= four && three <= five && three <= six && three <= seven) return three;
+    if (four <= one && four <= two && four <= three && four <= five && four <= six && four <= seven) return four;
+    if (five <= one && five <= two && five <= three && five <= four && five <= six && five <= seven) return four;
+    if (six <= one && six <= two && six <= three && six <= four && six <= five && six <= seven) return four;
+    return seven;
 }
 
 void cVersion() {
@@ -73,47 +77,57 @@ void cVersion() {
     unsigned char* line3A = malloc(sizeof(unsigned char) * PIXELS);
     unsigned char* line4A = malloc(sizeof(unsigned char) * PIXELS);
     unsigned char* line5A = malloc(sizeof(unsigned char) * PIXELS);
-    for (int line1 = 0; line1 < (PIXELS*PIXELS)-4; line1 += PIXELS) {
+    unsigned char* line6A = malloc(sizeof(unsigned char) * PIXELS);
+    unsigned char* line7A = malloc(sizeof(unsigned char) * PIXELS);
+    for (int line1 = 0; line1 < (PIXELS*PIXELS)-6; line1 += PIXELS) {
         int line2 = line1+PIXELS;
         int line3 = line2+PIXELS;
         int line4 = line3+PIXELS;
         int line5 = line4+PIXELS;
+        int line6 = line5+PIXELS;
+        int line7 = line6+PIXELS;
         
         // MAX VALUE
         for (int i = 0; i < PIXELS; i++) {
-            int value = getMaxValue(buffer[line1+i], buffer[line2+i], buffer[line3+i], buffer[line4+i], buffer[line5+i]);
+            int value = getMaxValue(buffer[line1+i], buffer[line2+i], buffer[line3+i], buffer[line4+i], buffer[line5+i], buffer[line6+i], buffer[line7+i]);
             line1A[i] = value;
             line2A[i] = value;
             line3A[i] = value;
             line4A[i] = value;
             line5A[i] = value;
+            line6A[i] = value;
+            line7A[i] = value;
         }
         // Shift value
         shift(line2A,1);
         shift(line3A,2);
         shift(line4A,3);
         shift(line5A,4);
+        shift(line6A,5);
+        shift(line7A,6);
         
         // FINAL max value in line1
         for (int i = 0; i < PIXELS-2; i++) {
-            bufferOut[line1+i] = getMaxValue(line1A[i], line2A[i], line3A[i], line4A[i], line5A[i]);
+            bufferOut[line1+i] = getMaxValue(line1A[i], line2A[i], line3A[i], line4A[i], line5A[i], line6A[i], line7A[i]);
         }
         
         // MIN VALUE
         // load line 1 & 2 & 3 and max value
         for (int i = 0; i < PIXELS; i++) {
-            int value = getMinValue(buffer[line1+i], buffer[line2+i], buffer[line3+i], buffer[line4+i], buffer[line5+i]);
+            int value = getMinValue(buffer[line1+i], buffer[line2+i], buffer[line3+i], buffer[line4+i], buffer[line5+i], buffer[line6+i], buffer[line7+i]);
             line1A[i] = value;
             line2A[i] = value;
             line3A[i] = value;
             line4A[i] = value;
             line5A[i] = value;
+            line6A[i] = value;
+            line7A[i] = value;
         }
         // Shift value and final value
         shift(line2A,1);
         shift(line3A,2);
         for (int i = 0; i < PIXELS-2; i++) {
-            bufferOut[line1+i] -= getMinValue(line1A[i], line2A[i], line3A[i], line4A[i], line5A[i]);
+            bufferOut[line1+i] -= getMinValue(line1A[i], line2A[i], line3A[i], line4A[i], line5A[i], line6A[i], line7A[i]);
         }
     }
     free(line1A);
@@ -121,6 +135,8 @@ void cVersion() {
     free(line3A);
     free(line4A);
     free(line5A);
+    free(line6A);
+    free(line7A);
     
     printf("[");
     for (int i = 0; i < PIXELS*PIXELS; i++) {
