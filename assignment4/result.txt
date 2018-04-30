@@ -1,0 +1,49 @@
+## 1 000
+
+Debug
+C
+min : 0.000000  max : 0.016000  avg : 0.003010
+
+ASM
+min : 0.000000  max : 0.015000  avg : 0.000015
+
+
+--------------------------------------
+
+Release
+C 
+min : 0.000000  max : 0.016000  avg : 0.003010
+ASM
+min : 0.000000  max : 0.015000  avg : 0.000015
+
+--------------------------------------
+--------------------------------------
+--------------------------------------
+
+## 10 000
+
+Debug
+C
+min : 0.000000  max : 0.016000  avg : 0.002899
+ASM
+min : 0.000000  max : 0.016000  avg : 0.000097
+
+Rapport de 29
+
+
+Release
+C
+min : 0.000000  max : 0.016000  avg : 0.000963
+ASM
+min : 0.000000  max : 0.016000  avg : 0.000091
+Rapport de 10
+
+
+--------------------------------------
+--------------------------------------
+--------------------------------------
+
+Difference between Debug and Release mode could be explain by the fact that in Debug mode some optimization are not made.  But debug mode could also add some information or initialization. For example, some Debug mode initialize automatically variables to zero.  Release mode optimize the code and do not save unnecessary information.
+
+
+
