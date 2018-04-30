@@ -1,16 +1,17 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <float.h>
 #include <limits.h>
 
 #define SIZE 1048576
 #define LOOP 65536
-#define SAMPLING_SIZE 100 // max 255
+#define SAMPLING_SIZE 300
 #define PIXELS 1024
 #define SCALE 7
 
 void getStatistics(float* dts, float* min, float* max, float* avg) {
-    unsigned char i;
+    unsigned int i;
     for(i = 0; i < SAMPLING_SIZE; i++) {
         *avg += dts[i];
         if(dts[i] < *min) {
@@ -96,34 +97,6 @@ void cVersion(float* dt) {
     }
     free(line);
 
-    unsigned int i;
-    printf("Result C:\n");
-    printf("[");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[i]);
-    }
-    printf("]\n");
-    printf("[");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[PIXELS+i]);
-    }
-    printf("]\n");
-    printf("[");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[2*PIXELS+i]);
-    }
-    printf("]\n");
-    printf("[");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[3*PIXELS+i]);
-    }
-    printf("]\n");
-    printf("[");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[4*PIXELS+i]);
-    }
-    printf("]\n");
-
     // End clock
     end = clock();
     *dt = (end - start)/(float)(CLOCKS_PER_SEC);
@@ -137,9 +110,8 @@ void cVersion(float* dt) {
     free(bufferOut);
 }
 
-void asmVersion() {
+void asmVersion(float* dt) {
     time_t start, end;
-    float dt;
 
     unsigned char* buffer = malloc(sizeof(unsigned char) * SIZE);
     unsigned char* bufferOut = malloc(sizeof(unsigned char) * SIZE);
@@ -152,12 +124,6 @@ void asmVersion() {
 
     fread(buffer, sizeof(unsigned char), SIZE, fp);
     fclose(fp);
-
-    unsigned char i;
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", buffer[i]);
-    }
-    printf("]\n");
 
     __asm__("mov $0, %%eax;\n"               // constante utilissé pour la comparaison
             "mov $104243, %%esi;\n"               // Counter = 101.8*1024 = 104243.2
@@ -260,36 +226,9 @@ void asmVersion() {
             : [buf]"r" (buffer)  // Input
             : "eax", "ebx", "esi", "edx", "xmm0", "xmm1", "xmm2"
             );
-    
+
     end = clock();
-    dt = (end - start)/(float)(CLOCKS_PER_SEC);
-    printf("Time: %f\n", dt);
-    printf("Result ASM:\n");
-    printf("[");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[i]);
-    }
-    printf("]\n");
-    printf("[");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[PIXELS+i]);
-    }
-    printf("]\n");
-    printf("[");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[2*PIXELS+i]);
-    }
-    printf("]\n");
-    printf("[");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[3*PIXELS+i]);
-    }
-    printf("]\n");
-    printf("[");
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[4*PIXELS+i]);
-    }
-    printf("]\n");
+    *dt = (end - start)/(float)(CLOCKS_PER_SEC);
 
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 
@@ -300,25 +239,26 @@ void asmVersion() {
 }
 
 int main() {
-    /*
     float dts[SAMPLING_SIZE];
-    float min;
-    float max;
-    float avg;
+    float min = FLT_MAX;
+    float max = 0.0;
+    float avg = 0.0;
+    unsigned int i;
 
-    unsigned char i;
     for(i = 0; i < SAMPLING_SIZE; i++) {
         cVersion(&dts[i]);
-        // asmVersion();
     }
-
     getStatistics(dts, &min, &max, &avg);
-    printf("min : %f\tmax : %f\tavg : %f\n", min, max, avg);
-    */
-    float dts[SAMPLING_SIZE];
+    printf("C Result: min : %f\tmax : %f\tavg : %f\n", min, max, avg);
+    min = FLT_MAX;
+    max = 0.0;
+    avg = 0.0;
 
-    asmVersion();
-    cVersion(&dts[0]);
+    for(i = 0; i < SAMPLING_SIZE; i++) {
+        asmVersion(&dts[i]);
+    }
+    getStatistics(dts, &min, &max, &avg);
+    printf("ASM Result: min : %f\tmax : %f\tavg : %f\n", min, max, avg);
 
     return 0;
 }

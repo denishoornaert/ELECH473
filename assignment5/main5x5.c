@@ -97,7 +97,6 @@ void cVersion(float* dt) {
     }
     free(line);
 
-    unsigned int i;
     // End clock
     end = clock();
     *dt = (end - start)/(float)(CLOCKS_PER_SEC);
