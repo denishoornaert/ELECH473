@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
-#include <limits.h>
 #include <float.h>
+#include <limits.h>
 
 #define SIZE 1048576
 #define LOOP 65536
 #define SAMPLING_SIZE 300
 #define PIXELS 1024
-#define SCALE 3
+#define SCALE 5
 
 void getStatistics(float* dts, float* min, float* max, float* avg) {
     unsigned int i;
@@ -97,14 +97,7 @@ void cVersion(float* dt) {
     }
     free(line);
 
-
-/*    printf("[");
     unsigned int i;
-    for (i = 0; i < PIXELS*PIXELS; ++i) {
-        printf("%u, ", bufferOut[i]);
-    }
-    printf("]");*/
-
     // End clock
     end = clock();
     *dt = (end - start)/(float)(CLOCKS_PER_SEC);
@@ -118,11 +111,14 @@ void cVersion(float* dt) {
     free(bufferOut);
 }
 
-void asmVersion(float* dt) {
+
+void asmVersion() {
     time_t start, end;
+    float dt;
 
     unsigned char* buffer = malloc(sizeof(unsigned char) * SIZE);
     unsigned char* bufferOut = malloc(sizeof(unsigned char) * SIZE);
+    start = clock();
 
     FILE *fp;
     fp = fopen("test.raw", "rb");
@@ -132,47 +128,74 @@ void asmVersion(float* dt) {
     fread(buffer, sizeof(unsigned char), SIZE, fp);
     fclose(fp);
 
-    start = clock();
-
     __asm__("mov $0, %%eax;\n"               // constante utilissé pour la comparaison
-            "mov $74752, %%esi;\n"               // Counter = 73*1024 =
+            "mov $87040, %%esi;\n"               // Counter = 85*1024 = 87040
             "mov %0, %%edx;\n"                  // Address destination
             // "add $1, %%edx;\n"                  // Décalage
             "mov %[buf], %%ebx;\n"              // Adresse des données
                 "loop: mov %%ebx, %%ecx;\n"       // Save ebx dans ecx
-                    "movdqu (%%ebx), %%xmm0;\n" // xmm0: line 1 (max)
-                    "movdqu (%%ebx), %%xmm3;\n" // xmm3: line 1 (min)
+                    "movdqu (%%ebx), %%xmm0;\n" // xmm0: line 1
                     "add $1024, %%ecx;\n"       // Décalage
-                    "movdqu (%%ecx), %%xmm1;\n" // xmm1: line 2 (max)
-                    "movdqu (%%ecx), %%xmm4;\n" // xmm4: line 2 (min)
+                    "movdqu (%%ecx), %%xmm1;\n" // xmm1: line 2
                     "add $1024, %%ecx;\n"       // Décalage
-                    "movdqu (%%ecx), %%xmm2;\n" // xmm2: line 3 (max)
-                    "movdqu (%%ecx), %%xmm5;\n" // xmm5: line 3 (min)
+                    "movdqu (%%ecx), %%xmm2;\n" // xmm2: line 3
+                    "add $1024, %%ecx;\n"       // Décalage
+                    "movdqu (%%ecx), %%xmm3;\n" // xmm2: line 4
+                    "add $1024, %%ecx;\n"       // Décalage
+                    "movdqu (%%ecx), %%xmm4;\n" // xmm2: line 5
+                    // Calcul min
+                    "movdqu %%xmm0, %%xmm5;\n"  // Move
+                    "pminub %%xmm1, %%xmm5;\n"  // Min line 1 & 2
+                    "pminub %%xmm2, %%xmm5;\n"  // Min line 1 & 3
+                    "pminub %%xmm3, %%xmm5;\n"  // Min line 1 & 4
+                    "pminub %%xmm4, %%xmm5;\n"  // Min line 1 & 5
+
                     // Calcul max
                     "pmaxub %%xmm1, %%xmm0;\n"  // Max line 1 & 2
                     "pmaxub %%xmm2, %%xmm0;\n"  // Max line 1 & 3
+                    "pmaxub %%xmm3, %%xmm0;\n"  // Max line 1 & 4
+                    "pmaxub %%xmm4, %%xmm0;\n"  // Max line 1 & 5
+
+
+                    "movdqu %%xmm5, %%xmm1;\n"  // Copie les minimums
+                    "psrldq $1, %%xmm1;\n"      // Shift Min
+                    "movdqu %%xmm1, %%xmm2;\n"
+                    "pminub %%xmm1, %%xmm5;\n"  // Min
+
+                    "psrldq $1, %%xmm2;\n"      // Shift Min
+                    "movdqu %%xmm2, %%xmm3;\n"
+                    "pminub %%xmm2, %%xmm5;\n"  // Min
+
+                    "psrldq $1, %%xmm3;\n"      // Shift Min
+                    "movdqu %%xmm3, %%xmm4;\n"
+                    "pminub %%xmm3, %%xmm5;\n"  // Min
+
+                    "psrldq $1, %%xmm4;\n"      // Shift Min
+                    "pminub %%xmm4, %%xmm5;\n"  // Min
+
                     "movdqu %%xmm0, %%xmm1;\n"  // Copie les maximum
-                    "movdqu %%xmm0, %%xmm2;\n"
                     "psrldq $1, %%xmm1;\n"      // Shift Max
-                    "psrldq $2, %%xmm2;\n"
-                    "pmaxub %%xmm1, %%xmm0;\n"  // Colon max
-                    "pmaxub %%xmm2, %%xmm0;\n"
-                    // Calcul min
-                    "pminub %%xmm4, %%xmm3;\n"  // Max line 1 & 2
-                    "pminub %%xmm5, %%xmm3;\n"  // Max line 1 & 3
-                    "movdqu %%xmm3, %%xmm4;\n"  // Copie les maximum
-                    "movdqu %%xmm3, %%xmm5;\n"
+                    "movdqu %%xmm1, %%xmm2;\n"
+                    "pmaxub %%xmm1, %%xmm0;\n"  // Max
+
+                    "psrldq $1, %%xmm2;\n"      // Shift Max
+                    "movdqu %%xmm2, %%xmm3;\n"
+                    "pmaxub %%xmm2, %%xmm0;\n"  // Max
+
+                    "psrldq $1, %%xmm3;\n"      // Shift Max
+                    "movdqu %%xmm3, %%xmm4;\n"
+                    "pmaxub %%xmm3, %%xmm0;\n"  // Max
+
                     "psrldq $1, %%xmm4;\n"      // Shift Max
-                    "psrldq $2, %%xmm5;\n"
-                    "pminub %%xmm4, %%xmm3;\n"  // Colon min
-                    "pminub %%xmm5, %%xmm3;\n"
+                    "pmaxub %%xmm4, %%xmm0;\n"  // Max
+
                     // Result
-                    "psubb %%xmm3, %%xmm0;\n"   // Difference
+                    "psubb %%xmm5, %%xmm0;\n"   // Difference
                     // Move result
                     "movdqu %%xmm0, (%%edx);\n" // Result TODO change ebx
                     // Add destination source
-                    "add $14, %%ebx;\n"         // Décalage source
-                    "add $14, %%edx;\n"         // Décalage destination
+                    "add $12, %%ebx;\n"         // Décalage source
+                    "add $12, %%edx;\n"         // Décalage destination
                     "sub $1, %%esi;\n"          // Decrementation
                     "cmp %%eax, %%esi;\n"
                 "jnz loop;\n"
@@ -182,13 +205,8 @@ void asmVersion(float* dt) {
             );
 
     end = clock();
-    *dt = (end - start)/(float)(CLOCKS_PER_SEC);
+    dt = (end - start)/(float)(CLOCKS_PER_SEC);
     //printf("Time: %f\n", dt);
-    /*unsigned char i;
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[i]);
-    }
-    printf("]\n");*/
 
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 
@@ -222,3 +240,4 @@ int main() {
 
     return 0;
 }
+

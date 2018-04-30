@@ -29,25 +29,48 @@ For a loop of 300 execusions (of each method (C and ASM)), we have the following
 
 ### Debug
 
-- ASM: 
 - C: 
+    - min: 0.14
+    - max: 0.187
+    - avg: 0.160743
+- ASM: 
+    - min: 0.14
+    - max: 0.187
+    - avg: 0.160743
 
 ### Release
 
-- ASM: 
 - C: 
+    - min: 0.015
+    - max: 0.032
+    - avg: 0.02564
+- ASM: 
+    - min: 0.015
+    - max: 0.032
+    - avg: 0.02564
 
 
 ## 7x7
 
 ### Debug
 
-- ASM: 
 - C: 
+    - min: 
+    - max: 
+    - avg: 
+- ASM: 
+    - min: 
+    - max: 
+    - avg: 
 
 ### Release
 
-- ASM: 
 - C: 
-
+    - min: 
+    - max: 
+    - avg: 
+- ASM: 
+    - min: 
+    - max: 
+    - avg: 
 
