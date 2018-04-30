@@ -6,7 +6,7 @@
 
 #define SIZE 1048576
 #define LOOP 65536
-#define SAMPLING_SIZE 100 // max 255
+#define SAMPLING_SIZE 1 // max 255
 #define PIXELS 1024
 #define SCALE 3
 
@@ -135,6 +135,8 @@ void asmVersion(float* dt) {
     start = clock();
 
     unsigned char i;
+    printf("Avant:\n")
+    printf("[")
     for(i = 0; i < 16; i++) {
         printf("%u, ", buffer[i]);
     }
@@ -189,7 +191,7 @@ void asmVersion(float* dt) {
 
     end = clock();
     *dt = (end - start)/(float)(CLOCKS_PER_SEC);
-    printf("Time: %f\n", dt);
+    //printf("Time: %f\n", dt);
     for(i = 0; i < 16; i++) {
         printf("%u, ", bufferOut[i]);
     }
