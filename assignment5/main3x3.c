@@ -6,12 +6,12 @@
 
 #define SIZE 1048576
 #define LOOP 65536
-#define SAMPLING_SIZE 1 // max 255
+#define SAMPLING_SIZE 300
 #define PIXELS 1024
 #define SCALE 3
 
 void getStatistics(float* dts, float* min, float* max, float* avg) {
-    unsigned char i;
+    unsigned int i;
     for(i = 0; i < SAMPLING_SIZE; i++) {
         *avg += dts[i];
         if(dts[i] < *min) {
@@ -111,7 +111,7 @@ void cVersion(float* dt) {
 
     // Save file
     FILE *foutput;
-    foutput = fopen("testOut.raw", "wb");
+    foutput = fopen("testOutC.raw", "wb");
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 
     free(buffer);
@@ -127,20 +127,12 @@ void asmVersion(float* dt) {
     FILE *fp;
     fp = fopen("test.raw", "rb");
     FILE *foutput;
-    foutput = fopen("testOut.raw", "wb");
+    foutput = fopen("testOutASM.raw", "wb");
 
     fread(buffer, sizeof(unsigned char), SIZE, fp);
     fclose(fp);
 
     start = clock();
-
-    unsigned char i;
-    printf("Avant:\n")
-    printf("[")
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", buffer[i]);
-    }
-    printf("]\n");
 
     __asm__("mov $0, %%eax;\n"               // constante utilissé pour la comparaison
             "mov $74752, %%esi;\n"               // Counter = 73*1024 =
@@ -192,10 +184,11 @@ void asmVersion(float* dt) {
     end = clock();
     *dt = (end - start)/(float)(CLOCKS_PER_SEC);
     //printf("Time: %f\n", dt);
+    /*unsigned char i;
     for(i = 0; i < 16; i++) {
         printf("%u, ", bufferOut[i]);
     }
-    printf("]\n");
+    printf("]\n");*/
 
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 

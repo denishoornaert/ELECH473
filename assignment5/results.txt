@@ -1,0 +1,53 @@
+# Results
+For a loop of 300 execusions (of each method (C and ASM)), we have the following timings
+
+## 3x3
+
+### Debug
+
+- C: 
+    - min: 0.078
+    - max: 0.11
+    - avg: 0.10457
+- ASM: 
+    - min: 0.0
+    - max: 0.016
+    - avg: 0.000363
+
+### Release
+
+- C: 
+    - min: 0.0
+    - max: 0.031
+    - avg: 0.015497
+- ASM: 
+    - min: 0.0
+    - max: 0.016
+    - avg: 0.00052
+
+## 5x5
+
+### Debug
+
+- ASM: 
+- C: 
+
+### Release
+
+- ASM: 
+- C: 
+
+
+## 7x7
+
+### Debug
+
+- ASM: 
+- C: 
+
+### Release
+
+- ASM: 
+- C: 
+
+
