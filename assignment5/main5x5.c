@@ -127,20 +127,19 @@ void asmVersion() {
     fread(buffer, sizeof(unsigned char), SIZE, fp);
     fclose(fp);
 
-    __asm__("mov $0, %%eax;\n"               // constante utilissé pour la comparaison
+    __asm__("mov $0, %%eax;\n"               // constante utilisÃ©e pour la comparaison
             "mov $87040, %%esi;\n"               // Counter = 85*1024 = 87040
             "mov %0, %%edx;\n"                  // Address destination
-            // "add $1, %%edx;\n"                  // Décalage
-            "mov %[buf], %%ebx;\n"              // Adresse des données
+            "mov %[buf], %%ebx;\n"              // Adresse des donnï¿½es
                 "loop: mov %%ebx, %%ecx;\n"       // Save ebx dans ecx
                     "movdqu (%%ebx), %%xmm0;\n" // xmm0: line 1
-                    "add $1024, %%ecx;\n"       // Décalage
+                    "add $1024, %%ecx;\n"       // DÃ©calage
                     "movdqu (%%ecx), %%xmm1;\n" // xmm1: line 2
-                    "add $1024, %%ecx;\n"       // Décalage
+                    "add $1024, %%ecx;\n"       // DÃ©calage
                     "movdqu (%%ecx), %%xmm2;\n" // xmm2: line 3
-                    "add $1024, %%ecx;\n"       // Décalage
+                    "add $1024, %%ecx;\n"       // DÃ©calage
                     "movdqu (%%ecx), %%xmm3;\n" // xmm2: line 4
-                    "add $1024, %%ecx;\n"       // Décalage
+                    "add $1024, %%ecx;\n"       // DÃ©calage
                     "movdqu (%%ecx), %%xmm4;\n" // xmm2: line 5
                     // Calcul min
                     "movdqu %%xmm0, %%xmm5;\n"  // Move
@@ -191,10 +190,10 @@ void asmVersion() {
                     // Result
                     "psubb %%xmm5, %%xmm0;\n"   // Difference
                     // Move result
-                    "movdqu %%xmm0, (%%edx);\n" // Result TODO change ebx
+                    "movdqu %%xmm0, (%%edx);\n"
                     // Add destination source
-                    "add $12, %%ebx;\n"         // Décalage source
-                    "add $12, %%edx;\n"         // Décalage destination
+                    "add $12, %%ebx;\n"         // Dï¿½calage source
+                    "add $12, %%edx;\n"         // Dï¿½calage destination
                     "sub $1, %%esi;\n"          // Decrementation
                     "cmp %%eax, %%esi;\n"
                 "jnz loop;\n"
@@ -205,7 +204,6 @@ void asmVersion() {
 
     end = clock();
     dt = (end - start)/(float)(CLOCKS_PER_SEC);
-    //printf("Time: %f\n", dt);
 
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 
@@ -239,4 +237,3 @@ int main() {
 
     return 0;
 }
-

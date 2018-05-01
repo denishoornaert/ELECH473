@@ -97,14 +97,6 @@ void cVersion(float* dt) {
     }
     free(line);
 
-
-/*    printf("[");
-    unsigned int i;
-    for (i = 0; i < PIXELS*PIXELS; ++i) {
-        printf("%u, ", bufferOut[i]);
-    }
-    printf("]");*/
-
     // End clock
     end = clock();
     *dt = (end - start)/(float)(CLOCKS_PER_SEC);
@@ -137,7 +129,6 @@ void asmVersion(float* dt) {
     __asm__("mov $0, %%eax;\n"               // constante utilissé pour la comparaison
             "mov $74752, %%esi;\n"               // Counter = 73*1024 =
             "mov %0, %%edx;\n"                  // Address destination
-            // "add $1, %%edx;\n"                  // Décalage
             "mov %[buf], %%ebx;\n"              // Adresse des données
                 "loop: mov %%ebx, %%ecx;\n"       // Save ebx dans ecx
                     "movdqu (%%ebx), %%xmm0;\n" // xmm0: line 1 (max)
@@ -183,12 +174,6 @@ void asmVersion(float* dt) {
 
     end = clock();
     *dt = (end - start)/(float)(CLOCKS_PER_SEC);
-    //printf("Time: %f\n", dt);
-    /*unsigned char i;
-    for(i = 0; i < 16; i++) {
-        printf("%u, ", bufferOut[i]);
-    }
-    printf("]\n");*/
 
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 
