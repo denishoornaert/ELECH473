@@ -74,3 +74,22 @@ For a loop of 300 execusions (of each method (C and ASM)), we have the following
     - max: 0.016
     - avg: 0.002543
 
+
+---------------------------
+
+# Result windows
+Use method describ in the assignment
+
+## 3x3
+
+### Debug
+- C
+    - min: 101.954928
+    - max: 108.967287
+    - avg: 104.330831
+- ASM
+    - min: 0.600043
+    - max: 0.734146
+    - avg: 0.651851
+
+
