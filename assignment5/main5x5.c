@@ -10,6 +10,11 @@
 #define PIXELS 1024
 #define SCALE 5
 
+#define FILE_INPUT "test.raw"
+#define FILE_OUTPUT_C "testOutC.raw"
+#define FILE_OUTPUT_ASM "testOutASM.raw"
+
+
 void getStatistics(float* dts, float* min, float* max, float* avg) {
     unsigned int i;
     for(i = 0; i < SAMPLING_SIZE; i++) {
@@ -42,7 +47,7 @@ void cVersion(float* dt) {
 
     // Open files
     FILE *fp;
-    fp = fopen("test.raw", "rb");
+    fp = fopen(FILE_INPUT, "rb");
 
     fread(buffer, sizeof(unsigned char), SIZE, fp);
     fclose(fp);
@@ -103,29 +108,28 @@ void cVersion(float* dt) {
 
     // Save file
     FILE *foutput;
-    foutput = fopen("testOutC.raw", "wb");
+    foutput = fopen(FILE_OUTPUT_C, "wb");
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 
     free(buffer);
     free(bufferOut);
 }
 
-
-void asmVersion() {
+void asmVersion(float* dt) {
     time_t start, end;
-    float dt;
 
     unsigned char* buffer = malloc(sizeof(unsigned char) * SIZE);
     unsigned char* bufferOut = malloc(sizeof(unsigned char) * SIZE);
-    start = clock();
 
     FILE *fp;
-    fp = fopen("test.raw", "rb");
+    fp = fopen(FILE_INPUT, "rb");
     FILE *foutput;
-    foutput = fopen("testOutASM.raw", "wb");
+    foutput = fopen(FILE_OUTPUT_ASM, "wb");
 
     fread(buffer, sizeof(unsigned char), SIZE, fp);
     fclose(fp);
+    
+    start = clock();
 
     __asm__("mov $0, %%eax;\n"               // constante utilisée pour la comparaison
             "mov $87040, %%esi;\n"               // Counter = 85*1024 = 87040
@@ -203,7 +207,7 @@ void asmVersion() {
             );
 
     end = clock();
-    dt = (end - start)/(float)(CLOCKS_PER_SEC);
+    *dt = (end - start)/(float)(CLOCKS_PER_SEC);
 
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 

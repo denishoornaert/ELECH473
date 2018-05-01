@@ -1,14 +1,19 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
-#include <limits.h>
 #include <float.h>
+#include <limits.h>
 
 #define SIZE 1048576
 #define LOOP 65536
 #define SAMPLING_SIZE 300
 #define PIXELS 1024
 #define SCALE 3
+
+#define FILE_INPUT "test.raw"
+#define FILE_OUTPUT_C "testOutC.raw"
+#define FILE_OUTPUT_ASM "testOutASM.raw"
+
 
 void getStatistics(float* dts, float* min, float* max, float* avg) {
     unsigned int i;
@@ -42,7 +47,7 @@ void cVersion(float* dt) {
 
     // Open files
     FILE *fp;
-    fp = fopen("test.raw", "rb");
+    fp = fopen(FILE_INPUT, "rb");
 
     fread(buffer, sizeof(unsigned char), SIZE, fp);
     fclose(fp);
@@ -103,7 +108,7 @@ void cVersion(float* dt) {
 
     // Save file
     FILE *foutput;
-    foutput = fopen("testOutC.raw", "wb");
+    foutput = fopen(FILE_OUTPUT_C, "wb");
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 
     free(buffer);
@@ -117,9 +122,9 @@ void asmVersion(float* dt) {
     unsigned char* bufferOut = malloc(sizeof(unsigned char) * SIZE);
 
     FILE *fp;
-    fp = fopen("test.raw", "rb");
+    fp = fopen(FILE_INPUT, "rb");
     FILE *foutput;
-    foutput = fopen("testOutASM.raw", "wb");
+    foutput = fopen(FILE_OUTPUT_ASM, "wb");
 
     fread(buffer, sizeof(unsigned char), SIZE, fp);
     fclose(fp);

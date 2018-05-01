@@ -9,7 +9,7 @@
 #define LOOP 65536
 #define SAMPLING_SIZE 300
 #define PIXELS 1024
-#define SCALE 3
+#define SCALE 7
 
 #define FILE_INPUT "test.raw"
 #define FILE_OUTPUT_C "testOutC.raw"
@@ -145,44 +145,99 @@ void asmVersion(double* dt) {
 
     StartCounter();
 
-    __asm__("mov $0, %%eax;\n"               // constante utilissé pour la comparaison
-            "mov $74752, %%esi;\n"               // Counter = 73*1024 =
+    __asm__("mov $0, %%eax;\n"               // constante utilisÃ©e pour la comparaison
+            "mov $104243, %%esi;\n"               // Counter = 101.8*1024 = 104243.2
             "mov %0, %%edx;\n"                  // Address destination
-            "mov %[buf], %%ebx;\n"              // Adresse des données
+            "mov %[buf], %%ebx;\n"              // Adresse des donnï¿½es
                 "loop: mov %%ebx, %%ecx;\n"       // Save ebx dans ecx
-                    "movdqu (%%ebx), %%xmm0;\n" // xmm0: line 1 (max)
-                    "movdqu (%%ebx), %%xmm3;\n" // xmm3: line 1 (min)
-                    "add $1024, %%ecx;\n"       // Décalage
-                    "movdqu (%%ecx), %%xmm1;\n" // xmm1: line 2 (max)
-                    "movdqu (%%ecx), %%xmm4;\n" // xmm4: line 2 (min)
-                    "add $1024, %%ecx;\n"       // Décalage
-                    "movdqu (%%ecx), %%xmm2;\n" // xmm2: line 3 (max)
-                    "movdqu (%%ecx), %%xmm5;\n" // xmm5: line 3 (min)
+                    "movdqu (%%ebx), %%xmm0;\n" // xmm0: line 1
+                    "add $1024, %%ecx;\n"       // DÃ©calage
+                    "movdqu (%%ecx), %%xmm1;\n" // xmm1: line 2
+                    "add $1024, %%ecx;\n"       // DÃ©calage
+                    "movdqu (%%ecx), %%xmm2;\n" // xmm2: line 3
+                    "add $1024, %%ecx;\n"       // DÃ©calage
+                    "movdqu (%%ecx), %%xmm3;\n" // xmm2: line 4
+                    "add $1024, %%ecx;\n"       // DÃ©calage
+                    "movdqu (%%ecx), %%xmm4;\n" // xmm2: line 5
+                    "add $1024, %%ecx;\n"       // DÃ©calage
+                    "movdqu (%%ecx), %%xmm5;\n" // xmm2: line 6
+                    "add $1024, %%ecx;\n"       // DÃ©calage
+                    "movdqu (%%ecx), %%xmm6;\n" // xmm2: line 7
+
+                    // Calcul min
+                    "movdqu %%xmm0, %%xmm7;\n"  // Move
+                    "pminub %%xmm1, %%xmm7;\n"  // Min line 1 & 2
+                    "pminub %%xmm2, %%xmm7;\n"  // Min line 1 & 3
+                    "pminub %%xmm3, %%xmm7;\n"  // Min line 1 & 4
+                    "pminub %%xmm4, %%xmm7;\n"  // Min line 1 & 5
+                    "pminub %%xmm5, %%xmm7;\n"  // Min line 1 & 5
+                    "pminub %%xmm6, %%xmm7;\n"  // Min line 1 & 5
+
                     // Calcul max
                     "pmaxub %%xmm1, %%xmm0;\n"  // Max line 1 & 2
                     "pmaxub %%xmm2, %%xmm0;\n"  // Max line 1 & 3
+                    "pmaxub %%xmm3, %%xmm0;\n"  // Max line 1 & 4
+                    "pmaxub %%xmm4, %%xmm0;\n"  // Max line 1 & 5
+                    "pmaxub %%xmm5, %%xmm0;\n"  // Max line 1 & 6
+                    "pmaxub %%xmm6, %%xmm0;\n"  // Max line 1 & 7
+
+                    // Minimum
+                    "movdqu %%xmm7, %%xmm1;\n"  // Copie les minimums
+                    "psrldq $1, %%xmm1;\n"      // Shift Min
+                    "movdqu %%xmm1, %%xmm2;\n"  // Save
+                    "pminub %%xmm1, %%xmm7;\n"  // Min
+
+                    "psrldq $1, %%xmm2;\n"      // Shift Min
+                    "movdqu %%xmm2, %%xmm3;\n"  // Save
+                    "pminub %%xmm2, %%xmm7;\n"  // Min
+
+                    "psrldq $1, %%xmm3;\n"      // Shift Min
+                    "movdqu %%xmm3, %%xmm4;\n"  // Save
+                    "pminub %%xmm3, %%xmm7;\n"  // Min
+
+                    "psrldq $1, %%xmm4;\n"      // Shift Min
+                    "movdqu %%xmm4, %%xmm5;\n"  // Save
+                    "pminub %%xmm4, %%xmm7;\n"  // Min
+
+                    "psrldq $1, %%xmm5;\n"      // Shift Min
+                    "movdqu %%xmm5, %%xmm6;\n"  // Save
+                    "pminub %%xmm5, %%xmm7;\n"  // Min
+
+                    "psrldq $1, %%xmm6;\n"      // Shift Min
+                    "pminub %%xmm6, %%xmm7;\n"  // Min
+
+                    // Maximum
                     "movdqu %%xmm0, %%xmm1;\n"  // Copie les maximum
-                    "movdqu %%xmm0, %%xmm2;\n"
                     "psrldq $1, %%xmm1;\n"      // Shift Max
-                    "psrldq $2, %%xmm2;\n"
-                    "pmaxub %%xmm1, %%xmm0;\n"  // Colon max
-                    "pmaxub %%xmm2, %%xmm0;\n"
-                    // Calcul min
-                    "pminub %%xmm4, %%xmm3;\n"  // Max line 1 & 2
-                    "pminub %%xmm5, %%xmm3;\n"  // Max line 1 & 3
-                    "movdqu %%xmm3, %%xmm4;\n"  // Copie les maximum
-                    "movdqu %%xmm3, %%xmm5;\n"
+                    "movdqu %%xmm1, %%xmm2;\n"
+                    "pmaxub %%xmm1, %%xmm0;\n"  // Max
+
+                    "psrldq $1, %%xmm2;\n"      // Shift Max
+                    "movdqu %%xmm2, %%xmm3;\n"
+                    "pmaxub %%xmm2, %%xmm0;\n"  // Max
+
+                    "psrldq $1, %%xmm3;\n"      // Shift Max
+                    "movdqu %%xmm3, %%xmm4;\n"
+                    "pmaxub %%xmm3, %%xmm0;\n"  // Max
+
                     "psrldq $1, %%xmm4;\n"      // Shift Max
-                    "psrldq $2, %%xmm5;\n"
-                    "pminub %%xmm4, %%xmm3;\n"  // Colon min
-                    "pminub %%xmm5, %%xmm3;\n"
+                    "movdqu %%xmm4, %%xmm5;\n"
+                    "pmaxub %%xmm4, %%xmm0;\n"  // Max
+
+                    "psrldq $1, %%xmm5;\n"      // Shift Max
+                    "movdqu %%xmm5, %%xmm6;\n"
+                    "pmaxub %%xmm5, %%xmm0;\n"  // Max
+
+                    "psrldq $1, %%xmm6;\n"      // Shift Max
+                    "pmaxub %%xmm6, %%xmm0;\n"  // Max
+
                     // Result
-                    "psubb %%xmm3, %%xmm0;\n"   // Difference
+                    "psubb %%xmm7, %%xmm0;\n"   // Difference
                     // Move result
                     "movdqu %%xmm0, (%%edx);\n" // Result TODO change ebx
                     // Add destination source
-                    "add $14, %%ebx;\n"         // Décalage source
-                    "add $14, %%edx;\n"         // Décalage destination
+                    "add $10, %%ebx;\n"         // Dï¿½calage source
+                    "add $10, %%edx;\n"         // Dï¿½calage destination
                     "sub $1, %%esi;\n"          // Decrementation
                     "cmp %%eax, %%esi;\n"
                 "jnz loop;\n"

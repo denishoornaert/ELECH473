@@ -30,24 +30,24 @@ For a loop of 300 execusions (of each method (C and ASM)), we have the following
 ### Debug
 
 - C: 
-    - min: 0.14
-    - max: 0.187
-    - avg: 0.160743
+    - min: 0.141
+    - max: 0.172
+    - avg: 0.1584463
 - ASM: 
-    - min: 0.14
-    - max: 0.187
-    - avg: 0.160743
+    - min: 0.0
+    - max: 0.016
+    - avg: 0.00213
 
 ### Release
 
 - C: 
     - min: 0.015
     - max: 0.032
-    - avg: 0.02564
+    - avg: 0.025847
 - ASM: 
-    - min: 0.015
-    - max: 0.032
-    - avg: 0.02564
+    - min: 0.0
+    - max: 0.016
+    - avg: 0.001827
 
 
 ## 7x7
@@ -78,7 +78,8 @@ For a loop of 300 execusions (of each method (C and ASM)), we have the following
 ---------------------------
 
 # Result windows
-Use method describ in the assignment
+Use method describ in the assignment.  It seems that the following result are in mili-second.
+
 
 ## 3x3
 
@@ -92,4 +93,58 @@ Use method describ in the assignment
     - max: 0.734146
     - avg: 0.651851
 
+### Release
+- C
+    - min: 14.911781
+    - max: 16.357152
+    - avg: 15.326075
+- ASM
+    - min: 0.59799
+    - max: 0.861065
+    - avg: 0.652081
 
+
+## 5x5
+
+### Debug
+- C
+    - min: 155.106265
+    - max: 180.117511
+    - avg: 159.231189
+- ASM
+    - min: 0.9873
+    - max: 1.166218
+    - avg: 1.03234
+
+### Release
+- C
+    - min: 25.135429
+    - max: 28.8769725
+    - avg: 25.842522
+- ASM
+    - min: 0.98901
+    - max: 1.203849
+    - avg: 1.05028
+
+
+## 7x7
+
+### Debug
+- C
+    - min: 225.471713
+    - max: 257.760103
+    - avg: 232.984554
+- ASM
+    - min: 1.733419
+    - max: 1.963994
+    - avg: 1.788
+
+### Release
+- C
+    - min: 35.267736
+    - max: 40.641779
+    - avg: 36.501906
+- ASM
+    - min: 1.733419
+    - max: 1.988283
+    - avg: 1.79539
