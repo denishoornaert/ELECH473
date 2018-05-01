@@ -26,3 +26,6 @@ In addition, by comparing the tables, we found out that the second method seems 
 | RELEASE | 3x3 | 0.014912 | 0.016357 | 0.015326 | 0.000598 | 0.000861 | 0.000652 |
 |         | 5x5 | 0.025135 | 0.028877 | 0.025842 | 0.000989 | 0.001204 | 0.001050 |
 |         | 7x7 | 0.035268 | 0.040642 | 0.036502 | 0.001733 | 0.001988 | 0.001795 |
+
+# System
+The results have been obtained using a Intel core i5 running at 3.0Gh and 4Gb of RAM.
