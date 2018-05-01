@@ -5,22 +5,22 @@ For a loop of 300 execusions (of each method (C and ASM)), we have the following
 
 ### Debug
 
-- C: 
+- C:
     - min: 0.078
     - max: 0.11
     - avg: 0.10457
-- ASM: 
+- ASM:
     - min: 0.0
     - max: 0.016
     - avg: 0.000363
 
 ### Release
 
-- C: 
+- C:
     - min: 0.0
     - max: 0.031
     - avg: 0.015497
-- ASM: 
+- ASM:
     - min: 0.0
     - max: 0.016
     - avg: 0.00052
@@ -29,22 +29,22 @@ For a loop of 300 execusions (of each method (C and ASM)), we have the following
 
 ### Debug
 
-- C: 
+- C:
     - min: 0.141
     - max: 0.172
     - avg: 0.1584463
-- ASM: 
+- ASM:
     - min: 0.0
     - max: 0.016
     - avg: 0.00213
 
 ### Release
 
-- C: 
+- C:
     - min: 0.015
     - max: 0.032
     - avg: 0.025847
-- ASM: 
+- ASM:
     - min: 0.0
     - max: 0.016
     - avg: 0.001827
@@ -54,22 +54,22 @@ For a loop of 300 execusions (of each method (C and ASM)), we have the following
 
 ### Debug
 
-- C: 
+- C:
     - min: 0.14
     - max: 0.281
     - avg: 0.242227
-- ASM: 
+- ASM:
     - min: 0.0
     - max: 0.016
     - avg: 0.002957
 
 ### Release
 
-- C: 
+- C:
     - min: 0.016
     - max: 0.047
     - avg: 0.03681
-- ASM: 
+- ASM:
     - min: 0.0
     - max: 0.016
     - avg: 0.002543
@@ -85,66 +85,66 @@ Use method describ in the assignment.  It seems that the following result are in
 
 ### Debug
 - C
-    - min: 101.954928
-    - max: 108.967287
-    - avg: 104.330831
+    - min: 0.101955
+    - max: 0.108967
+    - avg: 0.104331
 - ASM
-    - min: 0.600043
-    - max: 0.734146
-    - avg: 0.651851
+    - min: 0.000600
+    - max: 0.000734
+    - avg: 0.000652
 
 ### Release
 - C
-    - min: 14.911781
-    - max: 16.357152
-    - avg: 15.326075
+    - min: 0.014912
+    - max: 0.016357
+    - avg: 0.015326
 - ASM
-    - min: 0.59799
-    - max: 0.861065
-    - avg: 0.652081
+    - min: 0.000598
+    - max: 0.000861
+    - avg: 0.000652
 
 
 ## 5x5
 
 ### Debug
 - C
-    - min: 155.106265
-    - max: 180.117511
-    - avg: 159.231189
+    - min: 0.155106
+    - max: 0.180117
+    - avg: 0.159231
 - ASM
-    - min: 0.9873
-    - max: 1.166218
-    - avg: 1.03234
+    - min: 0.000987
+    - max: 0.001166
+    - avg: 0.001032
 
 ### Release
 - C
-    - min: 25.135429
-    - max: 28.8769725
-    - avg: 25.842522
+    - min: 0.025135
+    - max: 0.028877
+    - avg: 0.025842
 - ASM
-    - min: 0.98901
-    - max: 1.203849
-    - avg: 1.05028
+    - min: 0.000989
+    - max: 0.001204
+    - avg: 0.001050
 
 
 ## 7x7
 
 ### Debug
 - C
-    - min: 225.471713
-    - max: 257.760103
-    - avg: 232.984554
+    - min: 0.225472
+    - max: 0.257760
+    - avg: 0.232984
 - ASM
-    - min: 1.733419
-    - max: 1.963994
-    - avg: 1.788
+    - min: 0.001733
+    - max: 0.001964
+    - avg: 0.001788
 
 ### Release
 - C
-    - min: 35.267736
-    - max: 40.641779
-    - avg: 36.501906
+    - min: 0.035268
+    - max: 0.040642
+    - avg: 0.036502
 - ASM
-    - min: 1.733419
-    - max: 1.988283
-    - avg: 1.79539
+    - min: 0.001733
+    - max: 0.001988
+    - avg: 0.001795
