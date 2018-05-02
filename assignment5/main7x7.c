@@ -3,7 +3,6 @@
 #include <string.h>
 #include <float.h>
 #include <limits.h>
-#include <windows.h>
 
 #define SIZE 1048576
 #define LOOP 65536
@@ -11,10 +10,12 @@
 #define PIXELS 1024
 #define SCALE 7
 
-double PCFreq = 0.0;
-__int64 CounterStart = 0;
+#define FILE_INPUT "test.raw"
+#define FILE_OUTPUT_C "testOutC.raw"
+#define FILE_OUTPUT_ASM "testOutASM.raw"
 
-void getStatistics(double* dts, double* min, double* max, double* avg) {
+
+void getStatistics(float* dts, float* min, float* max, float* avg) {
     unsigned int i;
     for(i = 0; i < SAMPLING_SIZE; i++) {
         *avg += dts[i];
@@ -25,23 +26,7 @@ void getStatistics(double* dts, double* min, double* max, double* avg) {
             *max = dts[i];
         }
     }
-    *avg /= (double)SAMPLING_SIZE;
-}
-
-void StartCounter() {
-    LARGE_INTEGER li;
-    if(!QueryPerformanceFrequency(&li)) {
-        printf("QueryPerformanceFrequency failed!\n");
-    }
-    PCFreq = ((double)li.QuadPart)/1000.0;
-    QueryPerformanceCounter(&li);
-    CounterStart = li.QuadPart;
-}
-
-double GetCounter() {
-    LARGE_INTEGER li;
-    QueryPerformanceCounter(&li);
-    return ((double)li.QuadPart-CounterStart)/PCFreq;
+    *avg /= (float)SAMPLING_SIZE;
 }
 
 int getMaxValue(unsigned char one, unsigned char two) {
@@ -52,7 +37,9 @@ int getMinValue(unsigned char one, unsigned char two) {
     return one <= two ? one : two;
 }
 
-void cVersion(double* dt) {
+void cVersion(float* dt) {
+    // Start clock
+    time_t start, end;
 
     // Alloc and init variables
     unsigned char* buffer = malloc(sizeof(unsigned char) * SIZE);
@@ -60,13 +47,13 @@ void cVersion(double* dt) {
 
     // Open files
     FILE *fp;
-    fp = fopen("test.raw", "rb");
+    fp = fopen(FILE_INPUT, "rb");
 
     fread(buffer, sizeof(unsigned char), SIZE, fp);
     fclose(fp);
 
 
-    StartCounter();
+    start = clock();
 
     // ASM equivalent
     unsigned char* line = malloc(sizeof(unsigned char) * PIXELS);
@@ -116,32 +103,34 @@ void cVersion(double* dt) {
     free(line);
 
     // End clock
-    *dt = GetCounter();
+    end = clock();
+    *dt = (end - start)/(float)(CLOCKS_PER_SEC);
 
     // Save file
     FILE *foutput;
-    foutput = fopen("testOutC.raw", "wb");
+    foutput = fopen(FILE_OUTPUT_C, "wb");
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 
     free(buffer);
     free(bufferOut);
 }
 
-void asmVersion(double* dt) {
+void asmVersion(float* dt) {
+    time_t start, end;
 
     unsigned char* buffer = malloc(sizeof(unsigned char) * SIZE);
     unsigned char* bufferOut = malloc(sizeof(unsigned char) * SIZE);
 
     FILE *fp;
-    fp = fopen("test.raw", "rb");
+    fp = fopen(FILE_INPUT, "rb");
     FILE *foutput;
-    foutput = fopen("testOutASM.raw", "wb");
+    foutput = fopen(FILE_OUTPUT_ASM, "wb");
 
     fread(buffer, sizeof(unsigned char), SIZE, fp);
     fclose(fp);
 
-    StartCounter();
-
+    start = clock();
+    
     __asm__("mov $0, %%eax;\n"               // constante utilisée pour la comparaison
             "mov $104243, %%esi;\n"               // Counter = 101.8*1024 = 104243.2
             "mov %0, %%edx;\n"                  // Address destination
@@ -243,7 +232,8 @@ void asmVersion(double* dt) {
             : "eax", "ebx", "esi", "edx", "xmm0", "xmm1", "xmm2"
             );
 
-    *dt = GetCounter();
+    end = clock();
+    *dt = (end - start)/(float)(CLOCKS_PER_SEC);
 
     fwrite(bufferOut, sizeof(unsigned char), SIZE, foutput);
 
@@ -254,10 +244,10 @@ void asmVersion(double* dt) {
 }
 
 int main() {
-    double dts[SAMPLING_SIZE];
-    double min = FLT_MAX;
-    double max = 0.0;
-    double avg = 0.0;
+    float dts[SAMPLING_SIZE];
+    float min = FLT_MAX;
+    float max = 0.0;
+    float avg = 0.0;
     unsigned int i;
 
     for(i = 0; i < SAMPLING_SIZE; i++) {

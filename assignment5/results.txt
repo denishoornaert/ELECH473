@@ -1,0 +1,150 @@
+# Results
+For a loop of 300 execusions (of each method (C and ASM)), we have the following timings
+
+## 3x3
+
+### Debug
+
+- C:
+    - min: 0.078
+    - max: 0.11
+    - avg: 0.10457
+- ASM:
+    - min: 0.0
+    - max: 0.016
+    - avg: 0.000363
+
+### Release
+
+- C:
+    - min: 0.0
+    - max: 0.031
+    - avg: 0.015497
+- ASM:
+    - min: 0.0
+    - max: 0.016
+    - avg: 0.00052
+
+## 5x5
+
+### Debug
+
+- C:
+    - min: 0.141
+    - max: 0.172
+    - avg: 0.1584463
+- ASM:
+    - min: 0.0
+    - max: 0.016
+    - avg: 0.00213
+
+### Release
+
+- C:
+    - min: 0.015
+    - max: 0.032
+    - avg: 0.025847
+- ASM:
+    - min: 0.0
+    - max: 0.016
+    - avg: 0.001827
+
+
+## 7x7
+
+### Debug
+
+- C:
+    - min: 0.14
+    - max: 0.281
+    - avg: 0.242227
+- ASM:
+    - min: 0.0
+    - max: 0.016
+    - avg: 0.002957
+
+### Release
+
+- C:
+    - min: 0.016
+    - max: 0.047
+    - avg: 0.03681
+- ASM:
+    - min: 0.0
+    - max: 0.016
+    - avg: 0.002543
+
+
+---------------------------
+
+# Result windows
+Use method describ in the assignment.  It seems that the following result are in mili-second.
+
+
+## 3x3
+
+### Debug
+- C
+    - min: 0.101955
+    - max: 0.108967
+    - avg: 0.104331
+- ASM
+    - min: 0.000600
+    - max: 0.000734
+    - avg: 0.000652
+
+### Release
+- C
+    - min: 0.014912
+    - max: 0.016357
+    - avg: 0.015326
+- ASM
+    - min: 0.000598
+    - max: 0.000861
+    - avg: 0.000652
+
+
+## 5x5
+
+### Debug
+- C
+    - min: 0.155106
+    - max: 0.180117
+    - avg: 0.159231
+- ASM
+    - min: 0.000987
+    - max: 0.001166
+    - avg: 0.001032
+
+### Release
+- C
+    - min: 0.025135
+    - max: 0.028877
+    - avg: 0.025842
+- ASM
+    - min: 0.000989
+    - max: 0.001204
+    - avg: 0.001050
+
+
+## 7x7
+
+### Debug
+- C
+    - min: 0.225472
+    - max: 0.257760
+    - avg: 0.232984
+- ASM
+    - min: 0.001733
+    - max: 0.001964
+    - avg: 0.001788
+
+### Release
+- C
+    - min: 0.035268
+    - max: 0.040642
+    - avg: 0.036502
+- ASM
+    - min: 0.001733
+    - max: 0.001988
+    - avg: 0.001795
